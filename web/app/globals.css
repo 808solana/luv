@@ -4,7 +4,12 @@
   --color-background: #ffffff;
   --color-foreground: #0d0c12;
   --color-button: #675c56;
+  --color-muted: #6b6660;
+  --color-surface: #f5f4f1;
+  --color-surface-2: #ecebe7;
+  --color-accent: #0d0c12;
   --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-serif: "Instrument Serif", Georgia, serif;
 }
 
 html {
@@ -15,6 +20,11 @@ body {
   background: #ffffff;
   color: #0d0c12;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.font-serif-italic {
+  font-family: "Instrument Serif", Georgia, serif;
+  font-style: italic;
 }
 
 @media (prefers-reduced-motion: reduce) {
