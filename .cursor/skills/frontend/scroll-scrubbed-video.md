@@ -30,8 +30,8 @@ It seems "smoothest" but: (a) frames capped at a low width (e.g. 1280) get upsca
 ## Pitfalls
 - Next.js serves from `web/public/`; copy repo-root assets into `web/public/BRAND_ASSETS/`.
 - A single opaque ancestor (`body{background:#fff}`, page `bg-white`) hides the whole effect — hunt them all down.
-- If direct seeking is still choppy, the real fix is re-encoding the mp4 with dense keyframes / short GOP (e.g. `ffmpeg -i in.mp4 -g 1 -c:v libx264 out.mp4`), NOT more JS. Sparse keyframes force the decoder to walk from the previous keyframe on every seek.
-- Blur usually = source resolution lower than the (DPR-scaled) display, or an upscaling canvas. Direct video at native res is the sharpest you can get without a higher-res source.
+- If direct seeking is still choppy, the real fix is re-encoding the source for cheap seeks — dense keyframes (every frame, `-g 1`), short HLS segments (`-hls_time 1`), and ideally a multi-bitrate ladder (`-var_stream_map`/`master.m3u8`) so the browser can scrub small cheap chunks. NOT more JS. Confirmed real-world: Mux's multi-rendition short-segment stream scrubs smoothly; a single 8-second 5K `.ts` with B-frames is choppy because the decoder must walk the B-frame chain from the lone keyframe to decode each seek target.
+- Blur usually = source resolution lower than the (DPR-scaled) display, or an upscaling canvas. Direct video at native res is the sharpest you can get without a higher-res source. But: an over-large source (e.g. 5K) on a 4K-class display doesn't add visible sharpness and costs decode time per seek — match the source resolution to your max display, typically 3840x2160 for retina fullscreen.
 
 ## Verification
 - [ ] `npm run build` exits 0.

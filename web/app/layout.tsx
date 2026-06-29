@@ -23,7 +23,7 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col">
-        <ScrollVideoBackground src="https://stream.mux.com/LtB1WEO01Zzf2xnxlwBYlsn012sygnv02MJb00NE7wcR02DQ.m3u8" />
+        <ScrollVideoBackground src="https://video.korgems.com/stream/index.m3u8" />
         {children}
       </body>
     </html>
