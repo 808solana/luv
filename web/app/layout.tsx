@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { ScrollVideoBackground } from "@/components/scroll-video-background";
 
 export const metadata: Metadata = {
   title: "LUV13 — GLM-5.2 Hosting",
@@ -21,7 +22,10 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <ScrollVideoBackground src="https://stream.mux.com/LtB1WEO01Zzf2xnxlwBYlsn012sygnv02MJb00NE7wcR02DQ.m3u8" />
+        {children}
+      </body>
     </html>
   );
 }

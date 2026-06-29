@@ -14,10 +14,13 @@
 
 html {
   scroll-behavior: smooth;
+  /* Fallback background while the video decodes, and behind transparent areas. */
+  background: #000000;
 }
 
 body {
-  background: #ffffff;
+  /* Transparent so the fixed scroll-video background shows through the whole site. */
+  background: transparent;
   color: #0d0c12;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
@@ -25,6 +28,85 @@ body {
 .font-serif-italic {
   font-family: "Instrument Serif", Georgia, serif;
   font-style: italic;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Liquid glass utilities
+   Two variants:
+   - .liquid-glass        — subtle, for nav/chips/cards.
+   - .liquid-glass-strong — heavier blur, for primary CTA.
+   The ::before draws a top/bottom highlight border via a masked
+   padding ring (mask-composite: exclude), so the "border" is really
+   a gradient, not a real border, and respects border-radius: inherit.
+   ────────────────────────────────────────────────────────────── */
+.liquid-glass {
+  background: rgba(255, 255, 255, 0.01);
+  background-blend-mode: luminosity;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: none;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.liquid-glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.4px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.45) 0%,
+    rgba(255, 255, 255, 0.15) 20%,
+    rgba(255, 255, 255, 0) 40%,
+    rgba(255, 255, 255, 0) 60%,
+    rgba(255, 255, 255, 0.15) 80%,
+    rgba(255, 255, 255, 0.45) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.liquid-glass-strong {
+  background: rgba(255, 255, 255, 0.01);
+  background-blend-mode: luminosity;
+  backdrop-filter: blur(50px);
+  -webkit-backdrop-filter: blur(50px);
+  border: none;
+  box-shadow:
+    4px 4px 4px rgba(0, 0, 0, 0.05),
+    inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.liquid-glass-strong::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.4px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.5) 0%,
+    rgba(255, 255, 255, 0.2) 20%,
+    rgba(255, 255, 255, 0) 40%,
+    rgba(255, 255, 255, 0) 60%,
+    rgba(255, 255, 255, 0.2) 80%,
+    rgba(255, 255, 255, 0.5) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

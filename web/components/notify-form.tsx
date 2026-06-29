@@ -61,7 +61,7 @@ export function NotifyForm() {
       <button
         type="submit"
         disabled={status === "loading"}
-        className="h-12 rounded-sm bg-[#675c56] px-6 text-base font-bold text-white transition-colors hover:bg-[#0d0c12] disabled:opacity-60"
+        className="liquid-glass-strong h-12 rounded-sm px-6 text-base font-bold text-[#0d0c12] transition-colors disabled:opacity-60"
       >
         {status === "loading" ? "Sending..." : "Get notified"}
       </button>

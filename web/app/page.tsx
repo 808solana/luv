@@ -2,6 +2,7 @@ import Image from "next/image";
 import { ArrowRight, Check } from "lucide-react";
 import { WordsPullUp, WordsPullUpMultiStyle, FadeUp } from "@/components/words-pull-up";
 import { NotifyForm } from "@/components/notify-form";
+import { HolographicCard } from "@/components/holographic-card";
 
 const NAV_ITEMS = ["Our story", "The model", "Pricing", "Roadmap", "Get notified"];
 
@@ -40,21 +41,24 @@ const FEATURES = [
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 bg-white text-[#0d0c12]">
+    <div className="relative z-10 flex flex-col flex-1 text-[#0d0c12]">
       {/* SECTION 1 — HERO */}
-      <section className="relative h-screen p-4 md:p-6">
-        <div className="relative h-full w-full overflow-hidden rounded-2xl bg-white ring-1 ring-[#0d0c12]/10 md:rounded-[2rem]">
-          {/* Navbar pill */}
+      <section id="hero" className="relative h-screen p-4 md:p-6">
+        <div className="relative h-full w-full overflow-hidden rounded-2xl ring-1 ring-white/25 md:rounded-[2rem]">
+          {/* Decorative ambient blobs so the liquid-glass has real content to blur */}
+          <div aria-hidden className="pointer-events-none absolute -left-32 top-10 h-72 w-72 rounded-full bg-[#675c56]/15 blur-3xl" />
+          <div aria-hidden className="pointer-events-none absolute right-0 top-1/3 h-80 w-80 rounded-full bg-[#0d0c12]/10 blur-3xl" />
+          {/* Navbar pill — liquid glass */}
           <nav
             aria-label="Primary"
             className="absolute left-1/2 top-0 z-20 -translate-x-1/2"
           >
-            <ul className="flex items-center gap-3 rounded-b-2xl bg-[#0d0c12] px-4 py-2 sm:gap-6 md:gap-12 md:px-8 md:rounded-b-3xl">
+            <ul className="liquid-glass flex items-center gap-3 rounded-b-2xl px-4 py-2 sm:gap-6 md:gap-12 md:px-8 md:rounded-b-3xl">
               {NAV_ITEMS.map((item) => (
                 <li key={item}>
                   <a
                     href={`#${item.toLowerCase().replace(/\s+/g, "-")}`}
-                    className="text-[10px] font-medium uppercase tracking-widest text-[#E1E0CC]/80 transition-colors hover:text-[#E1E0CC] sm:text-xs md:text-sm"
+                    className="text-[10px] font-medium uppercase tracking-widest text-[#0d0c12]/70 transition-colors hover:text-[#0d0c12] sm:text-xs md:text-sm"
                   >
                     {item}
                   </a>
@@ -84,10 +88,10 @@ export default function Home() {
                 <FadeUp delay={0.7} className="mt-6">
                   <a
                     href="#get-notified"
-                    className="group inline-flex items-center gap-2 rounded-full bg-[#0d0c12] px-5 py-3 text-sm font-medium text-white transition-all hover:gap-3 sm:text-base"
+                    className="liquid-glass-strong group inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-medium text-[#0d0c12] transition-all hover:gap-3 sm:text-base"
                   >
                     Join the waitlist
-                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-[#0d0c12] transition-transform group-hover:scale-110 sm:h-10 sm:w-10">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0d0c12] text-white transition-transform group-hover:scale-110 sm:h-10 sm:w-10">
                       <ArrowRight className="h-4 w-4" strokeWidth={2} />
                       <span className="sr-only">Join the waitlist</span>
                     </span>
@@ -100,8 +104,8 @@ export default function Home() {
       </section>
 
       {/* SECTION 2 — ABOUT */}
-      <section id="our-story" className="bg-white px-6 py-20 md:px-12 md:py-28">
-        <div className="mx-auto max-w-6xl rounded-[2rem] bg-[#f5f4f1] px-6 py-16 text-center md:px-12 md:py-24">
+      <section id="our-story" className="px-6 py-20 md:px-12 md:py-28">
+        <div className="liquid-glass mx-auto max-w-6xl rounded-[2rem] px-6 py-16 text-center md:px-12 md:py-24">
           <p className="text-[10px] font-bold uppercase tracking-widest text-[#675c56] sm:text-xs">
             LLM Hosting
           </p>
@@ -127,7 +131,7 @@ export default function Home() {
       {/* SECTION 3 — FEATURES */}
       <section
         id="the-model"
-        className="min-h-screen bg-white px-6 py-20 md:px-12 md:py-28"
+        className="relative overflow-hidden px-6 py-20 md:px-12 md:py-28"
       >
         <div className="mx-auto max-w-7xl">
           <WordsPullUpMultiStyle
@@ -142,79 +146,86 @@ export default function Home() {
           <div className="mt-12 grid grid-cols-1 gap-3 sm:gap-2 md:grid-cols-2 md:gap-4 lg:grid-cols-3 lg:h-[480px]">
             {FEATURES.map((feature, i) => (
               <FadeUp key={feature.number} delay={i * 0.15}>
-                <article
-                  id={feature.number === "03" ? "roadmap" : undefined}
-                  className="flex h-full flex-col rounded-2xl bg-[#ecebe7] p-6 ring-1 ring-[#0d0c12]/5 md:p-8"
-                >
-                  <div className="flex items-start justify-between">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#0d0c12] text-white">
-                      <ArrowRight
-                        className="h-5 w-5 -rotate-45"
-                        strokeWidth={2}
-                        aria-hidden="true"
-                      />
-                    </span>
-                    <span className="text-xs font-bold tracking-widest text-[#0d0c12]/40">
-                      {feature.number}
-                    </span>
-                  </div>
-                  <h3 className="mt-6 text-xl font-bold text-[#0d0c12] md:text-2xl">
-                    {feature.title}
-                  </h3>
-                  <p className="mt-3 text-sm text-[#0d0c12]/70">{feature.intro}</p>
-                  <ul className="mt-6 flex flex-col gap-3">
-                    {feature.items.map((item) => (
-                      <li key={item} className="flex items-start gap-3">
-                        <Check
-                          className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#675c56]"
-                          strokeWidth={2.5}
+                <HolographicCard>
+                  <article
+                    id={feature.number === "03" ? "roadmap" : undefined}
+                    className="liquid-glass relative z-[2] flex h-full flex-col rounded-2xl p-6 md:p-8"
+                  >
+                    <div className="flex items-start justify-between">
+                      <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#0d0c12] text-white">
+                        <ArrowRight
+                          className="h-5 w-5 -rotate-45"
+                          strokeWidth={2}
                           aria-hidden="true"
                         />
-                        <span className="text-sm text-[#0d0c12]/80">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </article>
+                      </span>
+                      <span className="text-xs font-bold tracking-widest text-[#0d0c12]/40">
+                        {feature.number}
+                      </span>
+                    </div>
+                    <h3 className="mt-6 text-xl font-bold text-[#0d0c12] md:text-2xl">
+                      {feature.title}
+                    </h3>
+                    <p className="mt-3 text-sm text-[#0d0c12]/70">{feature.intro}</p>
+                    <ul className="mt-6 flex flex-col gap-3">
+                      {feature.items.map((item) => (
+                        <li key={item} className="flex items-start gap-3">
+                          <Check
+                            className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#675c56]"
+                            strokeWidth={2.5}
+                            aria-hidden="true"
+                          />
+                          <span className="text-sm text-[#0d0c12]/80">{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </article>
+                </HolographicCard>
               </FadeUp>
             ))}
           </div>
+        </div>
+      </section>
 
-          {/* Pricing card (full-width) */}
-          <FadeUp delay={0.15} className="mt-4">
-            <article
-              id="pricing"
-              className="rounded-2xl bg-[#0d0c12] p-8 text-white md:p-12"
-            >
+      {/* SECTION 4 — PRICING & API ACCESS */}
+      <section
+        id="pricing"
+        className="px-6 pb-20 md:px-12 md:pb-28"
+      >
+        <div className="mx-auto max-w-7xl flex flex-col gap-4">
+          {/* Pricing card */}
+          <FadeUp delay={0.15}>
+            <article className="liquid-glass rounded-2xl p-8 text-[#0d0c12] md:p-12">
               <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:items-center">
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-white/60 sm:text-xs">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-[#675c56] sm:text-xs">
                     Pricing
                   </p>
                   <WordsPullUp
-                    as="h3"
+                    as="h2"
                     text="Pay per token. Nothing else."
-                    className="mt-4 text-2xl font-bold leading-tight md:text-4xl"
+                    className="mt-4 text-2xl font-bold leading-tight text-[#0d0c12] md:text-4xl"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-6">
                   <div>
-                    <p className="text-4xl font-bold md:text-5xl">$0.13</p>
-                    <p className="mt-2 text-sm text-white/70">per 1M input tokens</p>
+                    <p className="text-4xl font-bold text-[#0d0c12] md:text-5xl">$0.13</p>
+                    <p className="mt-2 text-sm text-[#0d0c12]/70">per 1M input tokens</p>
                   </div>
                   <div>
-                    <p className="text-4xl font-bold md:text-5xl">$0.23</p>
-                    <p className="mt-2 text-sm text-white/70">per 1M output tokens</p>
+                    <p className="text-4xl font-bold text-[#0d0c12] md:text-5xl">$0.23</p>
+                    <p className="mt-2 text-sm text-[#0d0c12]/70">per 1M output tokens</p>
                   </div>
                 </div>
               </div>
             </article>
           </FadeUp>
 
-          {/* Notify card (full-width) */}
-          <FadeUp delay={0.15} className="mt-4">
+          {/* Notify card */}
+          <FadeUp delay={0.15}>
             <article
               id="get-notified"
-              className="rounded-2xl bg-[#f5f4f1] p-8 ring-1 ring-[#0d0c12]/10 md:p-12"
+              className="liquid-glass rounded-2xl p-8 md:p-12"
             >
               <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:items-center">
                 <div>
