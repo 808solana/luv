@@ -10,6 +10,18 @@
   --color-accent: #0d0c12;
   --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
   --font-serif: "Instrument Serif", Georgia, serif;
+  --font-helveticaneue-bold: "HelveticaNeue-Bold", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+@font-face {
+  font-family: "HelveticaNeue-Bold";
+  src:
+    local("Helvetica Neue Bold"),
+    local("HelveticaNeue-Bold"),
+    local("Helvetica Neue 700");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
 }
 
 html {

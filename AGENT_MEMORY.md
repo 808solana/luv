@@ -18,7 +18,7 @@
 - `web/components/scroll-video-background.tsx`: FIXED full-page video background for the whole site (mounted in `layout.tsx`, not page.tsx). Uses a native passive `scroll` listener to set `video.currentTime = (scrollY / maxScroll) * duration`. No canvas, no frame cache, no mouse parallax, no zoom scaling. Loading overlay until `canplay`.
 - Background video source in `layout.tsx`: self-hosted HD HLS `https://video.korgems.com/stream/index.m3u8` (5K@24fps, single 8s segment with B-frames). Was Mux HLS `https://stream.mux.com/LtB1WEO01Zzf2x...m3u8` (blurry due to top rendition 4K + auto-level selection), switched to self-hosted for sharpness. Local `backgroundyesyes.realesrgan.mp4` and earlier `filename*.m2ts/.m3u8` files no longer present in `web/public/BRAND_ASSETS/` (only `LUV13.png` and `typography.png` remain).
 - Frame extraction cap is display-driven: `scale = min(1, innerWidth*dpr / videoWidth)` (dpr capped at 2), then clamped against a ~1GB decoded-frame budget. NOT the original fixed 1280. Extracting above display res is invisible; full 5K x ≤120 frames ≈ 7GB and crashes the tab.
-- For the video to show site-wide: `body { background: transparent }`, `html { background:#000 }`, page root is `relative z-10`, and opaque section panels were made transparent / converted to `.liquid-glass`.
+- For the video to show site-wide: `body { background: transparent }`, `html { background:#000 }`, page root is `relative z-10`. No white backgrounds anywhere on the page — all sections are transparent over the video background with white text. `liquid-glass` and `liquid-glass-strong` classes may still exist in CSS but are no longer used on page sections.
 
 ## Environment
 - OS: Windows 10, PowerShell.
