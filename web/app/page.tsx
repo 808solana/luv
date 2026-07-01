@@ -53,7 +53,7 @@ export default function Home() {
         <GlassFilter />
         <div className="mx-auto max-w-6xl text-center">
           <GlassEffect
-            className="rounded-[40px] px-8 py-16 md:px-16 md:py-24 flex flex-col items-center justify-center gap-10"
+            className="rounded-[40px] px-8 py-16 md:px-16 md:py-24 flex flex-col items-center justify-center"
           >
             <WordsPullUpMultiStyle
               as="h2"
@@ -62,7 +62,7 @@ export default function Home() {
                 { text: "Start Creating" },
               ]}
             />
-            <FadeUp delay={0.2} className="flex justify-center">
+            <FadeUp delay={0.2} className="flex justify-center mt-[100px]">
               <FlowButton text="Api Key" />
             </FadeUp>
           </GlassEffect>
