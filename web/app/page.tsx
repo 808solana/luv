@@ -4,6 +4,8 @@ import { WordsPullUp, WordsPullUpMultiStyle, FadeUp } from "@/components/words-p
 import { ScrollFloat } from "@/components/scroll-float";
 import { NotifyForm } from "@/components/notify-form";
 import { HolographicCard } from "@/components/holographic-card";
+import { FlowButton } from "@/components/ui/flow-button";
+import { GlassEffect, GlassFilter } from "@/components/ui/liquid-glass";
 
 const FEATURES = [
   {
@@ -48,26 +50,22 @@ export default function Home() {
 
       {/* SECTION 2 — ABOUT */}
       <section id="our-story" className="px-6 py-20 md:px-12 md:py-28">
-        <div className="mx-auto max-w-6xl px-6 py-16 text-center md:px-12 md:py-24">
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-black/50 sm:text-xs">
-            LLM Hosting
-          </p>
-          <WordsPullUpMultiStyle
-            as="h2"
-            className="mx-auto mt-8 max-w-3xl text-3xl font-bold tracking-tight leading-[0.9] text-black sm:text-4xl sm:leading-[0.85] md:text-5xl lg:text-6xl xl:text-7xl"
-            segments={[
-              { text: "We host GLM-5.2," },
-              { text: "a capable general-purpose model,", className: "font-normal opacity-80" },
-              { text: "and keep our costs low so we can charge less." },
-            ]}
-          />
-          <FadeUp delay={0.2} className="mx-auto mt-10 max-w-2xl">
-            <p className="text-xs leading-relaxed text-black/70 sm:text-sm md:text-base">
-              Low costs and low prices, on infrastructure we run ourselves. No
-              middlemen, no markup, no surprise riders. Just the model, billed
-              honestly per token.
-            </p>
-          </FadeUp>
+        <GlassFilter />
+        <div className="mx-auto max-w-6xl text-center">
+          <GlassEffect
+            className="rounded-[40px] px-8 py-16 md:px-16 md:py-24 flex flex-col items-center justify-center gap-10"
+          >
+            <WordsPullUpMultiStyle
+              as="h2"
+              className="mx-auto max-w-3xl text-3xl font-bold tracking-tight leading-[0.9] text-black sm:text-4xl sm:leading-[0.85] md:text-5xl lg:text-6xl xl:text-7xl"
+              segments={[
+                { text: "Start Creating" },
+              ]}
+            />
+            <FadeUp delay={0.2} className="flex justify-center">
+              <FlowButton text="Api Key" />
+            </FadeUp>
+          </GlassEffect>
         </div>
       </section>
 

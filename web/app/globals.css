@@ -8,6 +8,15 @@
   --color-surface: #f5f4f1;
   --color-surface-2: #ecebe7;
   --color-accent: #0d0c12;
+  --color-accent-foreground: #ffffff;
+  --color-primary: #675c56;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #ecebe7;
+  --color-secondary-foreground: #0d0c12;
+  --color-destructive: #b91c1c;
+  --color-destructive-foreground: #ffffff;
+  --color-input: #d6d3ce;
+  --color-ring: #675c56;
   --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
   --font-serif: "Instrument Serif", Georgia, serif;
   --font-helveticaneue-bold: "HelveticaNeue-Bold", "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -86,10 +95,10 @@ body {
 }
 
 .liquid-glass-strong {
-  background: rgba(255, 255, 255, 0.01);
+  background: rgba(0, 0, 0, 0.138);
   background-blend-mode: luminosity;
-  backdrop-filter: blur(50px);
-  -webkit-backdrop-filter: blur(50px);
+  backdrop-filter: blur(80px) saturate(180%);
+  -webkit-backdrop-filter: blur(80px) saturate(180%);
   border: none;
   box-shadow:
     4px 4px 4px rgba(0, 0, 0, 0.05),
@@ -119,6 +128,15 @@ body {
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   pointer-events: none;
+}
+
+@keyframes moveBackground {
+  from {
+    background-position: 0% 0%;
+  }
+  to {
+    background-position: 0% -1000%;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
