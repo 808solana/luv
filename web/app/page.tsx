@@ -5,6 +5,8 @@ import { ScrollFloat } from "@/components/scroll-float";
 import { NotifyForm } from "@/components/notify-form";
 import { HolographicCard } from "@/components/holographic-card";
 import { FlowButton } from "@/components/ui/flow-button";
+import { BaseUrlDisplay } from "@/components/ui/base-url-display";
+import { SpecialText } from "@/components/ui/special-text";
 import { GlassEffect, GlassFilter } from "@/components/ui/liquid-glass";
 
 const FEATURES = [
@@ -55,14 +57,19 @@ export default function Home() {
           <GlassEffect
             className="rounded-[40px] px-8 py-16 md:px-16 md:py-24 flex flex-col items-center justify-center"
           >
-            <WordsPullUpMultiStyle
-              as="h2"
-              className="mx-auto max-w-3xl text-3xl font-bold tracking-tight leading-[0.9] text-black sm:text-4xl sm:leading-[0.85] md:text-5xl lg:text-6xl xl:text-7xl"
-              segments={[
-                { text: "Start Creating" },
-              ]}
-            />
-            <FadeUp delay={0.2} className="flex justify-center mt-[100px]">
+            <h2 className="mx-auto max-w-3xl text-3xl font-bold tracking-tight leading-[0.9] text-black sm:text-4xl sm:leading-[0.85] md:text-5xl lg:text-6xl xl:text-7xl">
+              <SpecialText
+                className="text-3xl font-bold tracking-tight leading-[0.9] text-black sm:text-4xl sm:leading-[0.85] md:text-5xl lg:text-6xl xl:text-7xl"
+                speed={20}
+                inView
+              >
+                START CREATING
+              </SpecialText>
+            </h2>
+            <FadeUp delay={0.2} className="flex justify-center mt-[60px]">
+              <BaseUrlDisplay />
+            </FadeUp>
+            <FadeUp delay={0.35} className="flex justify-center mt-[40px]">
               <FlowButton text="Api Key" />
             </FadeUp>
           </GlassEffect>

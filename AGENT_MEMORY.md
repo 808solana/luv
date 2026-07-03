@@ -15,7 +15,7 @@
 - Routes: `GET /` (single page), `POST /api/notify` (email capture via Resend), `GET /api/health`.
 - UI deps: `framer-motion` (animations), `lucide-react` (icons), `gsap` (installed but no longer used by the scroll-video background), `hls.js` (HLS source support — not exercised for local mp4, falls to direct src).
 - Static assets served from `web/public/` (NOT repo-root `BRAND_ASSETS/`). Copy assets into `web/public/BRAND_ASSETS/` to make them reachable at `/BRAND_ASSETS/...`.
-- `web/components/scroll-video-background.tsx`: FIXED full-page video background for the whole site (mounted in `layout.tsx`, not page.tsx). Uses a native passive `scroll` listener to set `video.currentTime = (scrollY / maxScroll) * duration`. No canvas, no frame cache, no mouse parallax, no zoom scaling. Loading overlay until `canplay`.
+- `web/components/scroll-video-background.tsx`: Fixed full-page video background for the whole site (mounted in `layout.tsx`, not page.tsx). Uses a native passive `scroll` listener to set `video.currentTime = (scrollY / maxScroll) * duration`. No canvas, no frame cache, no mouse parallax. Video element uses `object-contain` (NOT `object-cover`) so the full frame is always shown at a constant zoom regardless of viewport size — `object-cover` caused an apparent "zoom in" on wide desktop screens and "zoom out" on small windows. Letterbox bars blend into the black `html` background. Loading overlay until `canplay`.
 - Background video source in `layout.tsx`: self-hosted HD HLS `https://video.korgems.com/stream/index.m3u8` (5K@24fps, single 8s segment with B-frames). Was Mux HLS `https://stream.mux.com/LtB1WEO01Zzf2x...m3u8` (blurry due to top rendition 4K + auto-level selection), switched to self-hosted for sharpness. Local `backgroundyesyes.realesrgan.mp4` and earlier `filename*.m2ts/.m3u8` files no longer present in `web/public/BRAND_ASSETS/` (only `LUV13.png` and `typography.png` remain).
 - Frame extraction cap is display-driven: `scale = min(1, innerWidth*dpr / videoWidth)` (dpr capped at 2), then clamped against a ~1GB decoded-frame budget. NOT the original fixed 1280. Extracting above display res is invisible; full 5K x ≤120 frames ≈ 7GB and crashes the tab.
 - For the video to show site-wide: `body { background: transparent }`, `html { background:#000 }`, page root is `relative z-10`. No white backgrounds anywhere on the page — all sections are transparent over the video background with white text. `liquid-glass` and `liquid-glass-strong` classes may still exist in CSS but are no longer used on page sections.
@@ -27,6 +27,13 @@
 
 ## Tooling Notes
 - `.cursor\skills\tooling\project-setup.md` is for the previous Love AI project, not LUV13. Do not follow it directly for this project.
+- PowerShell session does not accept `&&` as a statement separator (CMD-era). Use `;` or the `working_directory` param / Set-Location. `cd path && npm run dev` throws `InvalidEndOfLine`.
+- A second `npm run dev` on port 3000 fails ("Another next dev server is already running"); the first one (PID tracked in `web/.next/dev/logs/`) hot-reloads on save. Don't spin a second dev server — just edit and the running one picks it up.
+- React hydration error in dev surfacing as "attributes of the server rendered HTML didn't match the client" with `data-cursor-ref="..."` diffs on every element is caused by the **TronLink** browser extension injecting attributes before React hydrates (dev log even says "browser extension installed which messes with the HTML before React loaded"). It is NOT a code bug — do not chase it. Same overlay is also where `Image` aspect-ratio warnings (`/BRAND_ASSETS/LUV13.png` width/height) come from; those are real but cosmetic.
+
+## Copy-to-Clipboard Pattern (client component)
+- Use `navigator.clipboard.writeText()` with an `execCommand('copy')` textarea fallback for non-secure contexts / old Safari.
+- Cross-fade the check / copy icons per `make-interfaces-feel-better` §7: `opacity` + `scale 0.25↔1` + `filter blur 4↔0`, spring transition with `bounce: 0` (the skill hard-requires bounce 0). Wrap in `<AnimatePresence initial={false}>`.
 
 ## Lessons Learned
 - Server Components in Next 16 App Router cannot receive event handlers (onMouseEnter etc.). Use pure CSS for hover states, or extract the interactive piece into a `"use client"` component.

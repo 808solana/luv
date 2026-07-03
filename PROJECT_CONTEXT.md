@@ -24,6 +24,7 @@ LUV13 will eventually offer its own API keys for coding agents/LLM plugins. For 
 - Single page at `/`.
 - One API route: `POST /api/notify` for email capture (Resend).
 - `GET /api/health` for quick verification.
+- Components: `words-pull-up` (WordsPullUp / WordsPullUpMultiStyle / FadeUp scroll animations), `scroll-float`, `holographic-card`, `notify-form`, `ui/flow-button` (animated arrow CTA), `ui/liquid-glass` (GlassEffect + GlassFilter SVG distortion), `ui/base-url-display` (shows `https://api.luv13.com/v1` with a copy-to-clipboard button; staggered reveal animation in the "our-story" glass panel).
 
 ## Deployment
 - Dockerized Debian mini PC (founder's hardware).
