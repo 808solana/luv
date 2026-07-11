@@ -70,7 +70,7 @@ export default function Home() {
               <BaseUrlDisplay />
             </FadeUp>
             <FadeUp delay={0.35} className="flex justify-center mt-[40px]">
-              <FlowButton text="Api Key" />
+              <FlowButton text="Api Key" href="/keys" />
             </FadeUp>
           </GlassEffect>
         </div>

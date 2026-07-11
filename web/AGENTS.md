@@ -1,6 +1,6 @@
 # AGENTS.md — LUV13
 
-**What this is:** A single-page information site for LUV13, an LLM hosting provider launching with GLM-5.2. The page's job is to look clean, state the value proposition (low costs → low prices), and capture emails for the upcoming API-key release.
+**What this is:** A marketing site plus stub API-key UI for LUV13, an LLM hosting provider launching with GLM-5.2. The home page states the value proposition (low costs → low prices) and captures emails. The `/keys` section lets users top up a mock balance and create API keys (server-side stub; no real payments yet).
 
 **Working directory:** `c:\Users\jgran\luv\web`
 
@@ -15,13 +15,23 @@
 web/
 ├── app/
 │   ├── api/
+│   │   ├── balance/route.ts         # GET /api/balance
 │   │   ├── health/route.ts          # GET /api/health
-│   │   └── notify/route.ts          # POST /api/notify
+│   │   ├── keys/route.ts            # GET + POST /api/keys
+│   │   ├── notify/route.ts          # POST /api/notify
+│   │   └── top-up/route.ts          # POST /api/top-up
+│   ├── keys/page.tsx                # API key management UI
+│   ├── top-up/page.tsx              # Top-up form
+│   ├── top-up/success/page.tsx      # Post top-up confirmation
 │   ├── globals.css                  # Tailwind v4 + brand tokens
-│   ├── layout.tsx                   # root layout, metadata, fonts
-│   └── page.tsx                     # single feed page
+│   ├── layout.tsx                   # root layout, metadata, fonts, video bg
+│   └── page.tsx                     # marketing home page
 ├── components/
-│   └── notify-form.tsx              # email capture form
+│   ├── api/                         # API section UI (shell, balance, keys, top-up)
+│   ├── notify-form.tsx              # email capture form
+│   └── ui/                          # flow-button, liquid-glass, copy-field, etc.
+├── lib/
+│   └── stub-store.ts                # in-memory balance + keys (dev/stub only)
 ├── public/
 │   └── BRAND_ASSETS/
 │       └── LUV13.png                # logo asset
@@ -57,10 +67,11 @@ Copy `.env.example` to `.env.local` and fill in for local development. Productio
 
 - **Tailwind CSS v4** is CSS-first. Use `@import "tailwindcss";` and `@theme inline {}` in `globals.css`. Do NOT use the older `@tailwind base/components/utilities` directives.
 - **Next.js 16 App Router API routes** live next to pages. A route is a directory with a `route.ts` file exporting HTTP handlers.
-- **API keys stay server-side.** `RESEND_API_KEY` and `NOTIFY_EMAIL` are only read inside API routes.
+- **API keys stay server-side.** `RESEND_API_KEY` and `NOTIFY_EMAIL` are only read inside API routes. Stub keys in `stub-store.ts` are in-memory only — lost on server restart.
 - **Docker uses standalone output.** `next.config.js` sets `output: 'standalone'` so the production image runs the Next.js server directly.
 - **No OpenRouter on the public site.** It is fine as an upstream provider in the future, but do not mention it in copy, URLs, or comments visible to users.
 - **Windows `.next` lock:** If `npm run build` fails with `EBUSY: resource busy or locked, rmdir '.next/standalone'`, a Node process is holding the directory. Stop all `node.exe` processes and retry.
+- **Windows PowerShell:** Do not chain with `&&`; use `;` or separate commands. A dev server already on port 3000 hot-reloads — do not start a second one.
 
 ## Brand Constraints
 
@@ -71,6 +82,13 @@ Copy `.env.example` to `.env.local` and fill in for local development. Productio
   - Text: `#0d0c12`.
   - Button background: `#675c56`.
 - Voice: "we". No founder biography. Simple, direct, no hype.
+
+## API Section User Flow
+
+1. Home → "Api Key" CTA → `/keys`
+2. Balance &lt; $5.00 → "Top up" → `/top-up` → mock payment → `/top-up/success` → auto-redirect `/keys`
+3. Balance ≥ $5.00 → create named key → copy base URL + full secret once
+4. Refresh `/keys` → key list shows masked prefix only
 
 ## Continuous Documentation
 
@@ -88,6 +106,7 @@ Before calling a phase complete, show evidence:
 2. Run `npm run dev` and verify `/api/health` returns `200 { "status": "ok" }`.
 3. Verify the page visually at 375px, 768px, and 1280px.
 4. Confirm keyboard navigation and focus rings work.
+5. Stub API smoke test: `GET /api/balance`, `POST /api/top-up`, `POST /api/keys`, `GET /api/keys`.
 
 ## Wrap-Up Protocol
 

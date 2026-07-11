@@ -21,17 +21,22 @@ LUV13 will eventually offer its own API keys for coding agents/LLM plugins. For 
 
 ## Architecture Snapshot
 - Next.js 16 (App Router), React, TypeScript, Tailwind CSS v4.
-- Single page at `/`.
-- One API route: `POST /api/notify` for email capture (Resend).
-- `GET /api/health` for quick verification.
-- Components: `words-pull-up` (WordsPullUp / WordsPullUpMultiStyle / FadeUp scroll animations), `scroll-float`, `holographic-card`, `notify-form`, `ui/flow-button` (animated arrow CTA), `ui/liquid-glass` (GlassEffect + GlassFilter SVG distortion), `ui/base-url-display` (shows `https://api.luv13.com/v1` with a copy-to-clipboard button; staggered reveal animation in the "our-story" glass panel).
+- Pages: `/` (marketing), `/keys` (API key management UI), `/top-up`, `/top-up/success`.
+- API routes:
+  - `GET /api/health` — health check
+  - `POST /api/notify` — email capture (Resend)
+  - `GET /api/balance` — stub balance (`balanceCents`, `currency`, `minBalanceCents`)
+  - `GET` + `POST /api/keys` — list/create API keys (in-memory stub; full secret returned once on create)
+  - `POST /api/top-up` — stub top-up (`amountCents`, `method`)
+- Stub data: `web/lib/stub-store.ts` — module-scoped in-memory balance + keys (starts at $0.00; swap for DB later).
+- Components: `words-pull-up`, `scroll-float`, `holographic-card`, `notify-form`, `ui/flow-button`, `ui/liquid-glass`, `ui/base-url-display`, `ui/copy-field`, `api/*` (shell, balance, keys, top-up).
 
 ## Deployment
 - Dockerized Debian mini PC (founder's hardware).
 - No Vercel-specific runtime APIs.
 
 ## Parking Lot
-- User auth, dashboard, billing, key management, model-selection API, docs, testimonials, blog, dark mode, OpenRouter branding.
+- User auth, real billing (Stripe/PayPal), persistent key storage, usage dashboards, key revocation, model-selection API, docs, testimonials, blog, dark mode, OpenRouter branding.
 
 ## Contact
 - (to be added when available)
