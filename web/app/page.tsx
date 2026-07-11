@@ -8,6 +8,7 @@ import { FlowButton } from "@/components/ui/flow-button";
 import { BaseUrlDisplay } from "@/components/ui/base-url-display";
 import { SpecialText } from "@/components/ui/special-text";
 import { GlassEffect, GlassFilter } from "@/components/ui/liquid-glass";
+import { ScrollVideoBackground } from "@/components/scroll-video-background";
 
 const FEATURES = [
   {
@@ -44,7 +45,9 @@ const FEATURES = [
 
 export default function Home() {
   return (
-    <div className="relative z-10 flex flex-col flex-1 text-black">
+    <>
+      <ScrollVideoBackground src="https://video.korgems.com/stream/index.m3u8" />
+      <div className="relative z-10 flex flex-col flex-1 text-black">
       {/* SECTION 1 — HERO */}
       <section id="hero" className="relative h-screen p-4 md:p-6">
         {/* Hero content removed */}
@@ -216,5 +219,6 @@ export default function Home() {
         </div>
       </footer>
     </div>
+    </>
   );
 }
