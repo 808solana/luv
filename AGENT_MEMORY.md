@@ -25,6 +25,13 @@
 - Default new-project stack per repo: React / TypeScript / Tailwind frontend; Python or Node backend.
 - FFmpeg installed via winget (`Gyan.FFmpeg`). Current shell may not see PATH immediately; binary path: `C:\Users\jgran\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-8.1.2-full_build\bin\ffmpeg.exe`.
 
+## 21st.dev Theme Install
+- `web/components.json` exists (hand-crafted, NOT via `shadcn init` — init rewrites `globals.css`). new-york style, neutral base, lucide icons, `@/*` aliases.
+- Theme color format (Serafim "Vercel"): **oklch channel triplets** (space-separated `L C H`), NOT HSL. Bridge in `@theme inline` is `oklch(var(--background))`, not `hsl(var(--background))`.
+- Public 21st.dev themes need NO API key. The `21st_sk_...` key in chat should be rotated (it only matters for private/publish).
+- Fetching theme CSS that 404s on `/r/...` URLs: open the theme page (`https://21st.dev/@<user>/<type>/<slug>`) with the cursor-ide-browser MCP, then read tokens via `getComputedStyle(document.documentElement)`. To get LIGHT values when the page defaults to dark (`html.dark`), temporarily `classList.remove('dark')`, read, restore. The "Copy CSS" button requires auth + clipboard focus and is unreliable in a backgrounded tab — computed styles are the reliable path.
+- `npm run build` exits 0; `/api/health` returns 200 after the merge. `globals.css.bak` kept for reversibility.
+
 ## Tooling Notes
 - `.cursor\skills\tooling\project-setup.md` is for the previous Love AI project, not LUV13. Do not follow it directly for this project.
 - PowerShell session does not accept `&&` as a statement separator (CMD-era). Use `;` or the `working_directory` param / Set-Location. `cd path && npm run dev` throws `InvalidEndOfLine`.

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { SmoothScroll } from "@/components/smooth-scroll";
 
 export const metadata: Metadata = {
   title: "LUV13 — GLM-5.2 Hosting",
@@ -22,6 +23,7 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col">
+        <SmoothScroll />
         {children}
       </body>
     </html>

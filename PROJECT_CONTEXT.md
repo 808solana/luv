@@ -11,10 +11,13 @@ A single-page information site for LUV13, an LLM hosting service. First model: G
 ## Brand Source of Truth
 - Logo: `BRAND_ASSETS/LUV13.png`
 - Typography: `BRAND_ASSETS/typography.png`
-- Font: Helvetica Neue Bold (fallback Helvetica / Arial / sans-serif).
-- Background: white.
-- Text color: `#0d0c12`.
-- Button background: `#675c56`.
+- Font: Helvetica Neue Bold (fallback Helvetica / Arial / sans-serif). `--font-sans`/`--font-serif`/`--font-helveticaneue-bold` in `@theme inline` STAY (LUV13 brand fonts); the Vercel theme ships its own `--font-sans` `General Sans` but LUV13 overrides it post-bridge.
+- Colors: **OVERRIDDEN** by Serafim "Vercel" 21st.dev theme (oklch). Old literals → new theme-bridged references:
+  - Background: `#ffffff` → `oklch(var(--background))` (light `1 0 0` white; dark `0.141 0.004 285.824` near-black)
+  - Foreground: `#0d0c12` → `oklch(var(--foreground))` (light `0.141 0.004 285.824`; dark `0.968 0.001 286.375`)
+  - Button: `#675c56` → `oklch(var(--primary))` (`0.485 0.291 264.121` — a vivid blue, same in light/dark)
+  - Surface/muted/accent/ring/etc. now reference the shadcn token set.
+- `web/components.json` now exists (hand-crafted; do NOT run `shadcn init`).
 
 ## Known Future State (do not expose publicly)
 LUV13 will eventually offer its own API keys for coding agents/LLM plugins. For v1 it routes upstream through OpenRouter; OpenRouter must not appear on the site.

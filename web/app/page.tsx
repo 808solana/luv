@@ -9,6 +9,7 @@ import { BaseUrlDisplay } from "@/components/ui/base-url-display";
 import { SpecialText } from "@/components/ui/special-text";
 import { GlassEffect, GlassFilter } from "@/components/ui/liquid-glass";
 import { ScrollVideoBackground } from "@/components/scroll-video-background";
+import { HostingImage } from "@/components/hosting-image";
 
 const FEATURES = [
   {
@@ -93,6 +94,10 @@ export default function Home() {
               { text: "Low costs. Low prices. Nothing extra.", className: "text-black/40 font-normal" },
             ]}
           />
+
+          <FadeUp delay={0.2} className="mt-12 flex justify-center">
+            <HostingImage src="/hosting-model-v2.png" alt="GLM-5.2 API preview" />
+          </FadeUp>
 
           <div className="mt-12 grid grid-cols-1 gap-3 sm:gap-2 md:grid-cols-2 md:gap-4 lg:grid-cols-3 lg:h-[480px]">
             {FEATURES.map((feature, i) => (
