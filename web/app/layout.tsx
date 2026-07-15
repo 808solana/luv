@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { ScrollVideoBackground } from "@/components/scroll-video-background";
+import { SmoothScroll } from "@/components/smooth-scroll";
 
 export const metadata: Metadata = {
   title: "LUV13 — GLM-5.2 Hosting",
@@ -23,7 +23,7 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col">
-        <ScrollVideoBackground src="https://video.korgems.com/stream/index.m3u8" />
+        <SmoothScroll />
         {children}
       </body>
     </html>

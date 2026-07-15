@@ -15,11 +15,7 @@ function formatCents(cents: number, currency: string) {
   }).format(cents / 100);
 }
 
-type BalanceDisplayProps = {
-  onBalanceChange?: (data: BalanceData) => void;
-};
-
-export function BalanceDisplay({ onBalanceChange }: BalanceDisplayProps) {
+export function BalanceDisplay() {
   const [data, setData] = useState<BalanceData | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -28,13 +24,11 @@ export function BalanceDisplay({ onBalanceChange }: BalanceDisplayProps) {
     try {
       const res = await fetch("/api/balance");
       if (!res.ok) throw new Error("Could not load balance.");
-      const json = (await res.json()) as BalanceData;
-      setData(json);
-      onBalanceChange?.(json);
+      setData((await res.json()) as BalanceData);
     } catch {
       setError("Could not load balance.");
     }
-  }, [onBalanceChange]);
+  }, []);
 
   useEffect(() => {
     load();

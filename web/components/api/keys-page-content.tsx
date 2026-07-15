@@ -21,7 +21,7 @@ export function KeysPageContent() {
 
   return (
     <div className="flex flex-col gap-8">
-      <BalanceDisplay onBalanceChange={() => refresh()} />
+      <BalanceDisplay />
 
       {!balance ? (
         <p className="text-sm text-black/50">Loading…</p>

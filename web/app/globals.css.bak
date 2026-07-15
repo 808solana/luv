@@ -1,0 +1,173 @@
+@import "tailwindcss";
+@import "@astryxdesign/core/astryx.css";
+
+@theme inline {
+  --color-background: #ffffff;
+  --color-foreground: #0d0c12;
+  --color-button: #675c56;
+  --color-muted: #6b6660;
+  --color-surface: #f5f4f1;
+  --color-surface-2: #ecebe7;
+  --color-accent: #0d0c12;
+  --color-accent-foreground: #ffffff;
+  --color-primary: #675c56;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #ecebe7;
+  --color-secondary-foreground: #0d0c12;
+  --color-destructive: #b91c1c;
+  --color-destructive-foreground: #ffffff;
+  --color-input: #d6d3ce;
+  --color-ring: #675c56;
+  --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-serif: "Instrument Serif", Georgia, serif;
+  --font-helveticaneue-bold: "HelveticaNeue-Bold", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+@font-face {
+  font-family: "HelveticaNeue-Bold";
+  src:
+    local("Helvetica Neue Bold"),
+    local("HelveticaNeue-Bold"),
+    local("Helvetica Neue 700");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+html {
+  scroll-behavior: smooth;
+  /* Fallback background while the video decodes, and behind transparent areas. */
+  background: #000000;
+}
+
+/* Lenis smooth-scroll setup */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+body {
+  /* Transparent so the fixed scroll-video background shows through the whole site. */
+  background: transparent;
+  color: #0d0c12;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.font-serif-italic {
+  font-family: "Instrument Serif", Georgia, serif;
+  font-style: italic;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Liquid glass utilities
+   Two variants:
+   - .liquid-glass        — subtle, for nav/chips/cards.
+   - .liquid-glass-strong — heavier blur, for primary CTA.
+   The ::before draws a top/bottom highlight border via a masked
+   padding ring (mask-composite: exclude), so the "border" is really
+   a gradient, not a real border, and respects border-radius: inherit.
+   ────────────────────────────────────────────────────────────── */
+.liquid-glass {
+  background: rgba(255, 255, 255, 0.01);
+  background-blend-mode: luminosity;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: none;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.liquid-glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.4px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.45) 0%,
+    rgba(255, 255, 255, 0.15) 20%,
+    rgba(255, 255, 255, 0) 40%,
+    rgba(255, 255, 255, 0) 60%,
+    rgba(255, 255, 255, 0.15) 80%,
+    rgba(255, 255, 255, 0.45) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.liquid-glass-strong {
+  background: rgba(0, 0, 0, 0.138);
+  background-blend-mode: luminosity;
+  backdrop-filter: blur(80px) saturate(180%);
+  -webkit-backdrop-filter: blur(80px) saturate(180%);
+  border: none;
+  box-shadow:
+    4px 4px 4px rgba(0, 0, 0, 0.05),
+    inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.liquid-glass-strong::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.4px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.5) 0%,
+    rgba(255, 255, 255, 0.2) 20%,
+    rgba(255, 255, 255, 0) 40%,
+    rgba(255, 255, 255, 0) 60%,
+    rgba(255, 255, 255, 0.2) 80%,
+    rgba(255, 255, 255, 0.5) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+@keyframes moveBackground {
+  from {
+    background-position: 0% 0%;
+  }
+  to {
+    background-position: 0% -1000%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
