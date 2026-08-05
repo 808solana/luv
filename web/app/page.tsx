@@ -55,31 +55,6 @@ export default function Home() {
       </section>
 
       {/* SECTION 2 — ABOUT */}
-      <section id="our-story" className="px-6 py-20 md:px-12 md:py-28">
-        <GlassFilter />
-        <div className="mx-auto max-w-6xl text-center">
-          <GlassEffect
-            className="rounded-[40px] px-8 py-16 md:px-16 md:py-24 flex flex-col items-center justify-center"
-          >
-            <h2 className="mx-auto max-w-3xl text-3xl font-bold tracking-tight leading-[0.9] text-black sm:text-4xl sm:leading-[0.85] md:text-5xl lg:text-6xl xl:text-7xl">
-              <SpecialText
-                className="text-3xl font-bold tracking-tight leading-[0.9] text-black sm:text-4xl sm:leading-[0.85] md:text-5xl lg:text-6xl xl:text-7xl"
-                speed={20}
-                inView
-              >
-                START CREATING
-              </SpecialText>
-            </h2>
-            <FadeUp delay={0.2} className="flex justify-center mt-[60px]">
-              <BaseUrlDisplay />
-            </FadeUp>
-            <FadeUp delay={0.35} className="flex justify-center mt-[40px]">
-              <FlowButton text="Api Key" href="/keys" />
-            </FadeUp>
-          </GlassEffect>
-        </div>
-      </section>
-
       {/* SECTION 3 — FEATURES */}
       <section
         id="the-model"
@@ -205,6 +180,32 @@ export default function Home() {
               </div>
             </article>
           </FadeUp>
+        </div>
+      </section>
+
+      {/* START CREATING */}
+      <section id="our-story" className="px-6 py-20 md:px-12 md:py-28">
+        <GlassFilter />
+        <div className="mx-auto max-w-6xl text-center">
+          <GlassEffect
+            className="rounded-[40px] px-8 py-16 md:px-16 md:py-24 flex flex-col items-center justify-center"
+          >
+            <h2 className="mx-auto max-w-3xl text-3xl font-bold tracking-tight leading-[0.9] text-black sm:text-4xl sm:leading-[0.85] md:text-5xl lg:text-6xl xl:text-7xl">
+              <SpecialText
+                className="text-3xl font-bold tracking-tight leading-[0.9] text-black sm:text-4xl sm:leading-[0.85] md:text-5xl lg:text-6xl xl:text-7xl"
+                speed={20}
+                inView
+              >
+                START CREATING
+              </SpecialText>
+            </h2>
+            <FadeUp delay={0.2} className="flex justify-center mt-[60px]">
+              <BaseUrlDisplay />
+            </FadeUp>
+            <FadeUp delay={0.35} className="flex justify-center mt-[40px]">
+              <FlowButton text="Api Key" href="/keys" />
+            </FadeUp>
+          </GlassEffect>
         </div>
       </section>
 
