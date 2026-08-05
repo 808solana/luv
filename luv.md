@@ -7,7 +7,8 @@ LUV13 is the public-facing foundation for a low-cost large-language-model (LLM) 
 The website currently has two layers:
 
 1. A highly visual marketing site at `/`, whose primary journey is **start creating → copy the API base URL → open the API-key area**.
-2. A deliberately simulated API-access flow: balance, top-up, and API-key pages. These are functional UI/API prototypes but are **not yet a production account, billing, or credential system**.
+2. A model directory at `/models`, currently populated from the documented launch catalog and equipped with client-side search, provider/capability filters, price/context formatting, and sorting.
+3. A deliberately simulated API-access flow: balance, top-up, and API-key pages. These are functional UI/API prototypes but are **not yet a production account, billing, or credential system**.
 
 The project is a Next.js 16 application in `web/`, written in TypeScript with React 19 and Tailwind CSS v4. It builds successfully as a standalone Node deployment suitable for the intended Docker deployment on a Debian mini PC.
 
@@ -30,10 +31,22 @@ The home page is a scroll-led brand experience rather than the original minimal 
 
 - A fixed HLS video (`https://video.korgems.com/stream/index.m3u8`) is used as the page background. As the visitor scrolls, the client code maps scroll progress to the video playhead.
 - The first viewport is an intentionally empty full-screen visual opening, allowing the video to establish the brand treatment.
-- The model section describes hosted GLM-5.2, low-cost pricing, and future API access, then presents an API-preview image and three interactive feature cards.
+- The model section is now the functional model directory: visitors can search, filter, sort, and inspect the documented GLM-5.2 launch record in place of the earlier static feature-card presentation.
 - The pricing section repeats the public price points.
 - The API-access section lets a visitor submit an email to be notified when keys are live.
 - The final primary content card says **START CREATING**, exposes `https://api.luv13.com/v1`, supports copying it to the clipboard, and links to `/keys`.
+
+### Model directory: `/models`
+
+The model directory is a compact, data-oriented catalog for the models LUV13 actually documents. Its first record is GLM-5.2, the launch model. It has no third-party logos or copied provider artwork: models receive compact generated initial marks until LUV13 has owned/provider-approved image assets.
+
+- The toolbar searches model name, identifier, provider, description, and capability labels as the visitor types.
+- The provider menu is generated from the current catalog.
+- Reasoning, Vision, Tool use, and Flex are keyboard-accessible, multi-select filters. Multiple active capability filters use AND behavior: a result must support every selected capability.
+- Sort options support popularity, release date, combined price, and context length. Records without the required data sort after those with it rather than being assigned invented values.
+- Cards are separate, lightly bordered rectangles. They stack at phone widths and retain a horizontal information hierarchy at larger widths.
+- Token pricing is unit-safe. Input and output prices are normalized to dollars per one million tokens and then added. GLM-5.2's published $0.13 input plus $0.23 output rate therefore renders as **$0.36 / 1M total tokens**.
+- Missing context, price, popularity, or release data is shown as unavailable or sorted safely; the app does not manufacture metadata.
 - The footer displays the LUV13 image logo and copyright.
 
 The visual language is animated and glass-like: smooth scrolling, word/fade entrances, a text-scramble effect, blur/translucency, and pointer-driven holographic card tilt. Motion is substantially reduced for visitors who set `prefers-reduced-motion`.
@@ -199,6 +212,7 @@ The page body is transparent over a black HTML fallback, because the visual back
 | --- | --- |
 | `web/app/layout.tsx` | Root metadata (`LUV13 — GLM-5.2 Hosting`), global CSS import, Instrument Serif preconnect/load hints, and site-wide Lenis component. |
 | `web/app/page.tsx` | Home-page composition, public product claims, prices, email form placement, visual components, and remote HLS background mount. |
+| `web/app/models/page.tsx` | Static `/models` route with a simple back-to-home header and the responsive client directory. |
 | `web/app/keys/page.tsx` | Thin route wrapper around the API-key shell and interactive content. |
 | `web/app/top-up/page.tsx` | Thin route wrapper around the top-up form. |
 | `web/app/top-up/success/page.tsx` | Reads `amount` from the query string and renders the confirmation content. |
@@ -226,6 +240,8 @@ The page body is transparent over a black HTML fallback, because the visual back
 | Copying | `ui/base-url-display.tsx` and `ui/copy-field.tsx` copy text with the Clipboard API and a legacy textarea fallback. |
 | Visual surface | `ui/liquid-glass.tsx` creates the larger SVG-filter glass effect used by the primary home card. |
 | API-key UI | `components/api/*` load balance and keys in the browser, gate key creation on the $5 balance, create/copy a key, provide the top-up selector, and display success state. |
+| Model directory UI | `components/models/*` provides the reusable toolbar, model card, capability badge, combined-price display, context display, and empty state. |
+| Model directory data/logic | `lib/models.ts` contains the documented launch catalog; `lib/model-directory.ts` owns unit-normalized pricing, context formatting, filtering, and sorting. |
 | Shared utility | `lib/utils.ts` combines `clsx` and `tailwind-merge` as `cn()`. |
 
 ### State model
@@ -285,7 +301,7 @@ The current root README and contributor guide refer to an `.env.example`, but no
 
 ## Verification performed for this review
 
-On August 4, 2026, I ran `npm run build` from `web/`. It completed successfully using Next.js 16.2.9/Turbopack. The build produced the expected public pages (`/`, `/keys`, `/top-up`) plus the dynamic API routes and the top-up success route.
+On August 4, 2026, I ran `npx tsc --noEmit` and `npm run build` from `web/`. Both completed successfully using Next.js 16.2.9/Turbopack. The build produced the expected public pages (`/`, `/models`, `/keys`, `/top-up`) plus the dynamic API routes and the top-up success route. `npm run lint` currently fails on five pre-existing `react-hooks/set-state-in-effect` errors in API-key and text-animation components; the model-directory files introduce no lint errors.
 
 ## Current-state gaps and documentation drift
 

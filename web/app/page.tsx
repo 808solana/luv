@@ -1,48 +1,13 @@
 import Image from "next/image";
-import { ArrowRight, Check } from "lucide-react";
-import { WordsPullUp, WordsPullUpMultiStyle, FadeUp } from "@/components/words-pull-up";
-import { ScrollFloat } from "@/components/scroll-float";
+import { WordsPullUp, FadeUp } from "@/components/words-pull-up";
 import { NotifyForm } from "@/components/notify-form";
-import { HolographicCard } from "@/components/holographic-card";
 import { FlowButton } from "@/components/ui/flow-button";
 import { BaseUrlDisplay } from "@/components/ui/base-url-display";
 import { SpecialText } from "@/components/ui/special-text";
 import { GlassEffect, GlassFilter } from "@/components/ui/liquid-glass";
 import { ScrollVideoBackground } from "@/components/scroll-video-background";
-import { HostingImage } from "@/components/hosting-image";
-
-const FEATURES = [
-  {
-    number: "01",
-    title: "Hosted GLM-5.2.",
-    intro: "One model, ready to call. No model selection, no routing config.",
-    items: [
-      "OpenAI-compatible /chat/completions endpoint",
-      "Streaming and batch responses",
-      "Consistent latency on owned hardware",
-    ],
-  },
-  {
-    number: "02",
-    title: "Low costs. Low prices.",
-    intro: "We run lean infrastructure and pass the savings through.",
-    items: [
-      "$0.13 per 1M input tokens",
-      "$0.23 per 1M output tokens",
-      "No platform fee, no minimum spend",
-    ],
-  },
-  {
-    number: "03",
-    title: "API keys, soon.",
-    intro: "We are opening direct access for coding agents and plugins.",
-    items: [
-      "Self-serve key generation",
-      "Usage dashboards and quotas",
-      "Drop-in for existing chat clients",
-    ],
-  },
-];
+import { ModelDirectory } from "@/components/models/model-directory";
+import { DIRECTORY_MODELS } from "@/lib/models";
 
 export default function Home() {
   return (
@@ -61,60 +26,7 @@ export default function Home() {
         className="relative overflow-hidden px-6 py-20 md:px-12 md:py-28"
       >
         <div className="mx-auto max-w-7xl">
-          <WordsPullUpMultiStyle
-            as="h2"
-            className="max-w-4xl text-xl font-bold tracking-tight leading-tight text-black sm:text-2xl md:text-3xl lg:text-4xl"
-            segments={[
-              { text: "Simple hosting for one good model." },
-              { text: "Low costs. Low prices. Nothing extra.", className: "text-black/40 font-normal" },
-            ]}
-          />
-
-          <FadeUp delay={0.2} className="mt-12 flex justify-center">
-            <HostingImage src="/hosting-model-v2.png" alt="GLM-5.2 API preview" />
-          </FadeUp>
-
-          <div className="mt-12 grid grid-cols-1 gap-3 sm:gap-2 md:grid-cols-2 md:gap-4 lg:grid-cols-3 lg:h-[480px]">
-            {FEATURES.map((feature, i) => (
-              <FadeUp key={feature.number} delay={i * 0.15}>
-                <HolographicCard>
-                  <article
-                    id={feature.number === "03" ? "roadmap" : undefined}
-                    className="relative z-[2] flex h-full flex-col rounded-2xl p-6 md:p-8 ring-1 ring-white/[0.08] [backdrop-filter:blur(4px)] [-webkit-backdrop-filter:blur(4px)]"
-                  >
-                    <div className="flex items-start justify-between">
-                      <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-white text-[#4e4f48]">
-                        <ArrowRight
-                          className="h-5 w-5 -rotate-45"
-                          strokeWidth={2}
-                          aria-hidden="true"
-                        />
-                      </span>
-                      <span className="text-xs font-bold tracking-widest text-black/40">
-                        {feature.number}
-                      </span>
-                    </div>
-                    <h3 className="mt-6 text-xl font-bold text-black md:text-2xl">
-                      {feature.title}
-                    </h3>
-                    <p className="mt-3 text-sm text-black/70">{feature.intro}</p>
-                    <ul className="mt-6 flex flex-col gap-3">
-                      {feature.items.map((item) => (
-                        <li key={item} className="flex items-start gap-3">
-                          <Check
-                            className="mt-0.5 h-4 w-4 flex-shrink-0 text-black/60"
-                            strokeWidth={2.5}
-                            aria-hidden="true"
-                          />
-                          <span className="text-sm text-black/80">{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </article>
-                </HolographicCard>
-              </FadeUp>
-            ))}
-          </div>
+          <ModelDirectory models={DIRECTORY_MODELS} />
         </div>
       </section>
 
