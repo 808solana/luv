@@ -80,9 +80,7 @@ export function ScrollFloat({
                   {char === " " ? "\u00A0" : char}
                 </span>
               ))}
-              {wi < wordsArr.length - 1 && (
-                <span className="char">&nbsp;</span>
-              )}
+              {wi < wordsArr.length - 1 && <span className="char">&nbsp;</span>}
             </span>
           ))}
         </span>

@@ -11,7 +11,8 @@ export const CAPABILITIES = [
 
 export type Capability = (typeof CAPABILITIES)[number];
 export type PriceUnit = "per_token" | "per_million_tokens";
-export type ModelSort = "popular" | "newest" | "lowest-price" | "highest-context";
+export type ModelSort =
+  "popular" | "newest" | "lowest-price" | "highest-context";
 
 export type ModelPrice = {
   amount: number;
@@ -27,8 +28,10 @@ export type DirectoryModel = {
   capabilities: Capability[];
   inputPrice?: ModelPrice;
   outputPrice?: ModelPrice;
+  totalPrice?: ModelPrice;
   contextTokens?: number;
   status?: string;
+  available?: boolean;
   badges?: string[];
   popularity?: number;
   releasedAt?: string;
@@ -52,7 +55,11 @@ export function normalizeToPricePerMillion(price?: ModelPrice): number | null {
  * Returns the all-in price for one million input plus one million output tokens.
  * A result is intentionally unavailable until both sides have a known unit/value.
  */
-export function getTotalPricePerMillionTokens(model: DirectoryModel): number | null {
+export function getTotalPricePerMillionTokens(
+  model: DirectoryModel,
+): number | null {
+  const flat = normalizeToPricePerMillion(model.totalPrice);
+  if (flat !== null) return flat;
   const input = normalizeToPricePerMillion(model.inputPrice);
   const output = normalizeToPricePerMillion(model.outputPrice);
 
@@ -63,12 +70,14 @@ export function formatTotalPricePerMillion(model: DirectoryModel): string {
   const total = getTotalPricePerMillionTokens(model);
   if (total === null) return "Pricing unavailable";
 
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 4,
-  }).format(total) + " / 1M total tokens";
+  return (
+    new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 4,
+    }).format(total) + " / 1M total tokens"
+  );
 }
 
 export function formatContextLength(contextTokens?: number): string {
@@ -124,10 +133,16 @@ export function filterModels(
   });
 }
 
-export function sortModels(models: DirectoryModel[], sort: ModelSort): DirectoryModel[] {
+export function sortModels(
+  models: DirectoryModel[],
+  sort: ModelSort,
+): DirectoryModel[] {
   return [...models].sort((a, b) => {
     if (sort === "lowest-price") {
-      return compareNullable(getTotalPricePerMillionTokens(a), getTotalPricePerMillionTokens(b));
+      return compareNullable(
+        getTotalPricePerMillionTokens(a),
+        getTotalPricePerMillionTokens(b),
+      );
     }
 
     if (sort === "highest-context") {
@@ -145,7 +160,10 @@ export function sortModels(models: DirectoryModel[], sort: ModelSort): Directory
   });
 }
 
-function compareNullable(a: number | null | undefined, b: number | null | undefined): number {
+function compareNullable(
+  a: number | null | undefined,
+  b: number | null | undefined,
+): number {
   if (a == null && b == null) return 0;
   if (a == null) return 1;
   if (b == null) return -1;

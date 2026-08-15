@@ -4,7 +4,9 @@ import { useState } from "react";
 
 export function NotifyForm() {
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [status, setStatus] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
   const [message, setMessage] = useState("");
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -35,7 +37,9 @@ export function NotifyForm() {
       }
 
       setStatus("success");
-      setMessage("You're on the list. We'll let you know when API keys are live.");
+      setMessage(
+        "You're on the list. We'll let you know when API keys are live.",
+      );
       setEmail("");
     } catch {
       setStatus("error");
@@ -44,7 +48,10 @@ export function NotifyForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mt-8 flex flex-col flex-wrap gap-4 sm:flex-row">
+    <form
+      onSubmit={handleSubmit}
+      className="mt-8 flex flex-col flex-wrap gap-4 sm:flex-row"
+    >
       <label htmlFor="email" className="sr-only">
         Email address
       </label>

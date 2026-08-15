@@ -43,8 +43,13 @@ export function ModelDirectory({ models }: { models: DirectoryModel[] }) {
     <section aria-labelledby="model-directory-heading">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-black/45">Models</p>
-          <h1 id="model-directory-heading" className="mt-2 text-3xl font-bold tracking-tight text-black sm:text-4xl">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-black/45">
+            Models
+          </p>
+          <h1
+            id="model-directory-heading"
+            className="mt-2 text-3xl font-bold tracking-tight text-black sm:text-4xl"
+          >
             Model directory
           </h1>
         </div>
@@ -60,17 +65,25 @@ export function ModelDirectory({ models }: { models: DirectoryModel[] }) {
           providers={providers}
           capabilities={filters.capabilities}
           sort={filters.sort}
-          onQueryChange={(query) => setFilters((current) => ({ ...current, query }))}
-          onProviderChange={(provider) => setFilters((current) => ({ ...current, provider }))}
+          onQueryChange={(query) =>
+            setFilters((current) => ({ ...current, query }))
+          }
+          onProviderChange={(provider) =>
+            setFilters((current) => ({ ...current, provider }))
+          }
           onCapabilityToggle={toggleCapability}
-          onSortChange={(sort) => setFilters((current) => ({ ...current, sort }))}
+          onSortChange={(sort) =>
+            setFilters((current) => ({ ...current, sort }))
+          }
         />
       </div>
 
       <div className="mt-5">
         {results.length > 0 ? (
           <div className="flex flex-col gap-3">
-            {results.map((model) => <ModelCard key={model.id} model={model} />)}
+            {results.map((model) => (
+              <ModelCard key={model.id} model={model} />
+            ))}
           </div>
         ) : (
           <EmptyModelState onClear={() => setFilters(initialFilters)} />

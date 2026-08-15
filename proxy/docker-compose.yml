@@ -1,0 +1,78 @@
+version: '3.8'
+services:
+  proxy:
+    build: .
+    container_name: luv13-proxy
+    restart: always
+    ports:
+      - "4000:4000"
+    environment:
+      # Auth secrets
+      - ADMIN_TOKEN=${ADMIN_TOKEN}
+      - JWT_SECRET=${JWT_SECRET}
+      # Browser login for /admin/* (https://api.luv13.com/admin/login)
+      - ADMIN_USERNAME=${ADMIN_USERNAME:-}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-}
+      - ADMIN_SESSION_TTL_DAYS=${ADMIN_SESSION_TTL_DAYS:-7}
+      # Optional tunables
+      - NEURALWATT_BASE_URL=${NEURALWATT_BASE_URL:-https://api.neuralwatt.com/v1}
+      - PORT=4000
+      - YOUR_INPUT_PRICE_PER_M=${YOUR_INPUT_PRICE_PER_M:-0.33}
+      - YOUR_OUTPUT_PRICE_PER_M=${YOUR_OUTPUT_PRICE_PER_M:-0.33}
+      - YOUR_CACHED_INPUT_PRICE_PER_M=${YOUR_CACHED_INPUT_PRICE_PER_M:-0.33}
+      - BLENDED_COST_PER_M=${BLENDED_COST_PER_M:-0.20}
+      - MAX_KEYS_PER_CUSTOMER=${MAX_KEYS_PER_CUSTOMER:-5}
+      # Concurrency-slot router (replaces time-based cooldowns).
+      # Each account carries at most 3 in-flight requests; 429s never
+      # blacklist, they resync the counter and retry within 200-500ms.
+      - PROXY_ACCOUNT_MAX_CONCURRENCY=${PROXY_ACCOUNT_MAX_CONCURRENCY:-3}
+      - PROXY_BUDGET_COOLDOWN=${PROXY_BUDGET_COOLDOWN:-300}
+      - PROXY_ERROR_PAUSE=${PROXY_ERROR_PAUSE:-1.0}
+      - PROXY_429_RETRY_WAIT_MIN=${PROXY_429_RETRY_WAIT_MIN:-0.2}
+      - PROXY_429_RETRY_WAIT_MAX=${PROXY_429_RETRY_WAIT_MAX:-0.5}
+      - PROXY_429_SYNC_TTL_MS=${PROXY_429_SYNC_TTL_MS:-1000}
+      - PROXY_INFLIGHT_LOG_INTERVAL=${PROXY_INFLIGHT_LOG_INTERVAL:-5}
+      # Soft cache affinity (least-loaded tie-break) + delayed stream hedge.
+      - PROXY_CACHE_AFFINITY=${PROXY_CACHE_AFFINITY:-1}
+      - PROXY_HEDGE_ENABLED=${PROXY_HEDGE_ENABLED:-0}
+      - PROXY_HEDGE_AFTER_MS=${PROXY_HEDGE_AFTER_MS:-2500}
+      # Single-account isolation for capacity tests (no cross-account failover):
+      #   PROXY_ISOLATE_ACCOUNT=TEST1
+      #   PROXY_ISOLATE_INDEX=1
+      - PROXY_ISOLATE_ACCOUNT=${PROXY_ISOLATE_ACCOUNT:-}
+      - PROXY_ISOLATE_INDEX=${PROXY_ISOLATE_INDEX:-}
+      # Streaming heartbeat + stall failover
+      - PROXY_HEARTBEAT_INTERVAL=${PROXY_HEARTBEAT_INTERVAL:-5}
+      # 15 minutes — long enough for GLM-5.2 reasoning gaps; keepalives still
+      # fire every PROXY_HEARTBEAT_INTERVAL so Cursor does not idle-timeout.
+      - STREAM_STALL_TIMEOUT_MS=${STREAM_STALL_TIMEOUT_MS:-900000}
+      # Post-content idle timeout: tighter idle detection after content starts
+      # flowing (mid-generation silence = upstream death). Pre-content thinking
+      # pauses are still protected by the generous STREAM_STALL_TIMEOUT_MS above.
+      - PROXY_POST_CONTENT_IDLE_TIMEOUT_MS=${PROXY_POST_CONTENT_IDLE_TIMEOUT_MS:-35000}
+      # Finite stream read timeout (seconds). Must NOT be unbounded under gevent.
+      # Default 900s (15 min) aligned with STREAM_STALL_TIMEOUT_MS.
+      - PROXY_STREAM_READ_TIMEOUT=${PROXY_STREAM_READ_TIMEOUT:-900}
+      - PROXY_MAX_STREAM_RETRIES=${PROXY_MAX_STREAM_RETRIES:-50}
+      - PROXY_CONNECT_TIMEOUT=${PROXY_CONNECT_TIMEOUT:-60}
+      # Overload protection: if first token takes >N ms, release the slot and retry elsewhere
+      - PROXY_FIRST_TOKEN_TIMEOUT_MS=${PROXY_FIRST_TOKEN_TIMEOUT_MS:-10000}
+      - PROXY_NONSTREAM_READ_TIMEOUT=${PROXY_NONSTREAM_READ_TIMEOUT:-10}
+      # Queue wait: when all accounts are at cap, hold + heartbeat (not 503). >0 = bounded wait, then 503.
+      - PROXY_QUEUE_MAX_WAIT=${PROXY_QUEUE_MAX_WAIT:-0}
+      # Temporary live-stream capture (raw upstream + forwarded SSE) for hang diagnosis.
+      # Disable with PROXY_CAPTURE_ENABLED=0 once the hang is found — writes full
+      # model output to disk. Never stores API keys (only account name + key_prefix).
+      - PROXY_CAPTURE_ENABLED=${PROXY_CAPTURE_ENABLED:-1}
+      - PROXY_CAPTURE_DIR=${PROXY_CAPTURE_DIR:-/tmp/luv13-live-captures}
+      - PROXY_CAPTURE_MAX_FILES=${PROXY_CAPTURE_MAX_FILES:-100}
+      # Agent-steering system-prompt injection: appends execution rules to the
+      # system prompt on tool-using (agentic) requests so GLM-5.2 doesn't end
+      # turns claiming a nonexistent "background agent" is working (the freeze
+      # root cause). Set 0 to disable for A/B testing.
+      - PROXY_INJECT_AGENT_STEERING=${PROXY_INJECT_AGENT_STEERING:-1}
+    volumes:
+      # SQLite DB persists across container rebuilds / restarts.
+      - ./data:/app/data
+      # Live stream captures (ring-buffered JSONL) for hang diagnosis.
+      - ./data/captures:/tmp/luv13-live-captures

@@ -1,0 +1,20 @@
+{
+  "admin_secret": "CHANGE_ME",
+  "upstream_root": "http://PROXY_HOST:4000",
+  "upstream_api_key": "sk-REDACTED-PLACEHOLDER",
+  "models": {
+    "luv13-glm-5.2": {
+      "upstream": "glm-5.2",
+      "rate_umicro_per_million": 330000
+    },
+    "luv-1": {
+      "upstream": "glm-5.2",
+      "rate_umicro_per_million": 330000
+    }
+  },
+  "output_floor_tokens": 100,
+  "rate_limit_per_key_per_minute": 60,
+  "monthly_token_cap_per_user": 0,
+  "database_path": "data/luv13.db",
+  "listen_port": 4100
+}

@@ -39,8 +39,12 @@
   --sidebar-accent: 0.968 0.001 286.375;
   --sidebar-accent-foreground: 0.21 0.006 285.883;
   --sidebar-border: 0.928 0.006 264.531;
-  --font-sans: "General Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-mono: ui-monospace, "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas, monospace;
+  --font-sans:
+    "General Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  --font-mono:
+    ui-monospace, "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas,
+    monospace;
 }
 
 .dark {
@@ -121,14 +125,14 @@
   /* Brand fonts stay (LUV13 choice). */
   --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
   --font-serif: "Instrument Serif", Georgia, serif;
-  --font-helveticaneue-bold: "HelveticaNeue-Bold", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-helveticaneue-bold:
+    "HelveticaNeue-Bold", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 @font-face {
   font-family: "HelveticaNeue-Bold";
   src:
-    local("Helvetica Neue Bold"),
-    local("HelveticaNeue-Bold"),
+    local("Helvetica Neue Bold"), local("HelveticaNeue-Bold"),
     local("Helvetica Neue 700");
   font-weight: 700;
   font-style: normal;

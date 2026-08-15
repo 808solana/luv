@@ -1,10 +1,5 @@
-import { KeysPageContent } from "@/components/api/keys-page-content";
-import { ApiShell } from "@/components/api/api-shell";
+import { redirect } from "next/navigation";
 
 export default function KeysPage() {
-  return (
-    <ApiShell title="API keys">
-      <KeysPageContent />
-    </ApiShell>
-  );
+  redirect("/dashboard");
 }

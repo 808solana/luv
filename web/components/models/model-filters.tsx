@@ -41,7 +41,9 @@ export function ModelFilters({
         </label>
 
         <div className="grid grid-cols-1 gap-3 sm:flex sm:flex-wrap sm:items-center">
-          <label className="sr-only" htmlFor="provider-filter">Provider</label>
+          <label className="sr-only" htmlFor="provider-filter">
+            Provider
+          </label>
           <select
             id="provider-filter"
             value={provider}
@@ -50,7 +52,9 @@ export function ModelFilters({
           >
             <option value="all">All providers</option>
             {providers.map((providerName) => (
-              <option key={providerName} value={providerName}>{providerName}</option>
+              <option key={providerName} value={providerName}>
+                {providerName}
+              </option>
             ))}
           </select>
 

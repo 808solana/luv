@@ -5,7 +5,9 @@ type EmptyModelStateProps = {
 export function EmptyModelState({ onClear }: EmptyModelStateProps) {
   return (
     <div className="border border-dashed border-black/15 px-5 py-12 text-center sm:px-8">
-      <h2 className="text-base font-bold text-black">No models match these filters.</h2>
+      <h2 className="text-base font-bold text-black">
+        No models match these filters.
+      </h2>
       <p className="mt-2 text-sm text-black/60">
         Try another search or reset the active filters.
       </p>

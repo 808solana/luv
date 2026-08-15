@@ -88,8 +88,14 @@ export function HolographicCard({
 
   return (
     <div
+      id={id}
       ref={cardRef}
-      className="relative h-full overflow-hidden rounded-2xl [transform-style:preserve-3d]"
+      className={[
+        "relative h-full overflow-hidden rounded-2xl [transform-style:preserve-3d]",
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
       style={
         {
           transition: "transform 400ms ease-out",

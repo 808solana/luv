@@ -63,7 +63,9 @@ export function CopyField({ label, value, mono = true }: CopyFieldProps) {
       <button
         type="button"
         onClick={handleCopy}
-        aria-label={copied ? "Copied" : `Copy ${label.toLowerCase()} to clipboard`}
+        aria-label={
+          copied ? "Copied" : `Copy ${label.toLowerCase()} to clipboard`
+        }
         className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-[#111111] transition-transform duration-200 hover:bg-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#675c56] active:scale-[0.96]"
       >
         <AnimatePresence initial={false} mode="popLayout">

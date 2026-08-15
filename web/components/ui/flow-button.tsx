@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 
 type FlowButtonProps = {
   text?: string;
   href?: string;
-  type?: 'button' | 'submit';
+  type?: "button" | "submit";
   disabled?: boolean;
   onClick?: () => void;
 };
@@ -14,26 +14,26 @@ type FlowButtonProps = {
 const inner = (text: string) => (
   <>
     <ArrowRight
-      className="absolute w-4 h-4 left-[-25%] stroke-[#111111] fill-none z-[9] group-hover:left-4 transition-all duration-[800ms] ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+      className="absolute left-4 z-[9] h-4 w-4 -translate-x-6 fill-none stroke-[#111111] opacity-0 transition-[transform,opacity] duration-300 ease-out group-hover:translate-x-0 group-hover:opacity-100"
       aria-hidden="true"
     />
-    <span className="relative z-[1] -translate-x-3 group-hover:translate-x-3 transition-all duration-[800ms] ease-out text-[#111111]">
+    <span className="relative z-[1] -translate-x-3 text-[#111111] transition-transform duration-300 ease-out group-hover:translate-x-3">
       {text}
     </span>
     <ArrowRight
-      className="absolute w-4 h-4 right-4 stroke-[#111111] fill-none z-[9] group-hover:right-[-25%] transition-all duration-[800ms] ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+      className="absolute right-4 z-[9] h-4 w-4 fill-none stroke-[#111111] transition-[transform,opacity] duration-300 ease-out group-hover:translate-x-8 group-hover:opacity-0"
       aria-hidden="true"
     />
   </>
 );
 
 const className =
-  'liquid-glass group relative flex items-center gap-1 overflow-hidden rounded-[100px] bg-white/25 px-8 py-3 text-sm font-semibold text-[#111111] cursor-pointer transition-all duration-[600ms] ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.95] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#675c56] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100';
+  "liquid-glass group relative flex min-h-11 items-center gap-1 overflow-hidden rounded-[100px] bg-white/25 px-8 py-3 text-sm font-semibold text-[#111111] cursor-pointer transition-[transform,opacity] duration-200 ease-out active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100";
 
 export function FlowButton({
-  text = 'Api Key',
+  text = "Api Key",
   href,
-  type = 'button',
+  type = "button",
   disabled,
   onClick,
 }: FlowButtonProps) {

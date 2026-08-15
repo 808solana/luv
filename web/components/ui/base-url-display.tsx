@@ -9,7 +9,7 @@ import {
 } from "framer-motion";
 import { Check, Copy } from "lucide-react";
 
-const BASE_URL = "https://api.luv13.com/v1";
+const BASE_URL = "https://api.luv13.ai/v1";
 const EASE = [0.16, 1, 0.3, 1] as const;
 
 const container: Variants = {
@@ -113,11 +113,7 @@ export function BaseUrlDisplay() {
               transition={iconTransition}
               className="absolute inset-0 flex items-center justify-center"
             >
-              <Copy
-                className="h-5 w-5"
-                strokeWidth={2}
-                aria-hidden="true"
-              />
+              <Copy className="h-5 w-5" strokeWidth={2} aria-hidden="true" />
             </motion.span>
           )}
         </AnimatePresence>

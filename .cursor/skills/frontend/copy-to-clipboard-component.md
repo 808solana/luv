@@ -31,3 +31,6 @@ tags: [frontend, react, next, animation, accessibility]
 - [ ] Check icon appears, reverts to copy icon after ~2s.
 - [ ] No hydration warning in console from this component (it's `"use client"`, state starts at `false`/default icon on both server and client).
 - [ ] `npm run build` exits 0 with no TS errors.
+
+## Usage
+- 2026-08-13: Reused for one-time API-key, base URL, model slug, and curl copy controls.

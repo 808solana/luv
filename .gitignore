@@ -1,0 +1,58 @@
+# Secrets and local configuration (sanitized examples remain tracked)
+.env
+.env.*
+!.env.example
+!.env.sample
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.sample
+**/config.json
+!**/config.example.json
+
+# Databases and customer/runtime data
+**/data/
+**/generated/
+**/*.db
+**/*.db-*
+**/*.sqlite
+**/*.sqlite-*
+**/*-wal
+**/*-shm
+
+# Keys, certificates, logs, caches, and environments
+**/*.pem
+**/*.key
+**/*.crt
+**/*.cer
+**/*.p12
+**/*.pfx
+**/*.log
+**/logs/
+**/__pycache__/
+**/*.py[cod]
+**/.pytest_cache/
+**/.mypy_cache/
+**/.ruff_cache/
+**/.cache/
+**/.venv/
+**/venv/
+
+# Dependencies and build output
+**/node_modules/
+**/.next/
+**/dist/
+**/build/
+**/coverage/
+
+# Rollback, backup, and generated diagnostic artifacts
+**/rollback/
+**/rollback*/
+**/backup/
+**/backups/
+**/*.bak
+**/*.bak.*
+**/*.backup
+**/*capture*
+**/*results*.json
+**/._.

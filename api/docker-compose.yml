@@ -1,0 +1,12 @@
+services:
+  luv13-api:
+    build: .
+    container_name: luv13-api
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "4100:4100"
+    volumes:
+      - ./data:/app/data
+      - ./config.json:/app/config.json:ro
