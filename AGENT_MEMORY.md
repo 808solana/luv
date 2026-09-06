@@ -43,6 +43,8 @@
 
 ## Environment
 - Current local OS: macOS (Darwin), zsh. Older notes below may describe the previous Windows environment.
+- Git remote `origin` is `https://github.com/808solana/luv.git`. Do not create a second Cursor-hosted copy while that remote exists.
+- Local source snapshots live in `/Users/real/luv-backups/` (archives exclude `.git`, `node_modules`, `.next`, `.env*`, keys, DBs). Git branch/tag pattern: `backup/pre-changes-YYYY-MM-DD`. 2026-08-24 snapshot: `backup/pre-changes-2026-08-24` @ `ba34af64cdf67ccf55b57a5bc56c9e18f3b9e43b` (clean tree, already on `origin/main`).
 - Default new-project stack per repo: React / TypeScript / Tailwind frontend; Python or Node backend.
 - FFmpeg installed via winget (`Gyan.FFmpeg`). Current shell may not see PATH immediately; binary path: `C:\Users\jgran\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-8.1.2-full_build\bin\ffmpeg.exe`.
 
@@ -70,6 +72,9 @@
 - `backgroundyesyes.mp4` is a local mp4, NOT a Mux/HLS stream — hls.js isn't exercised for it; the direct `video.src` path runs. Keep hls.js dynamic-imported so mp4 doesn't pay for it.
 - Scroll-scrubbed video: current user preference is native passive `scroll` listener driving `video.currentTime` directly. No GSAP ScrollTrigger, no canvas/frame-cache, no mouse parallax, no zoom scaling. If direct seeking is still choppy, the real fix is re-encoding the source with dense keyframes / short GOP + multi-segment HLS (`ffmpeg -i in.mp4 -g 1 -c:v libx264 -f hls -hls_time 1 -hls_playlist_type vod out.m3u8`), NOT more JS. Confirmed in real bug: a single 8s `.ts` at 5120x2880 with B-frames was choppy on scrub; Mux's multi-segment multi-bitrate rendition was smooth. Dense keyframes + short segments lets the browser seek cheaply and decode small chunks.
 
+
+## Curator
+- tasks_since_review: 1
 
 # AGENTS.md — luv13
 
