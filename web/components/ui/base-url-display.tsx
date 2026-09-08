@@ -63,7 +63,7 @@ export function BaseUrlDisplay() {
       variants={container}
       initial="hidden"
       animate={visible ? "show" : "hidden"}
-      className="flex items-center gap-2 rounded-2xl bg-white/15 px-5 py-3 sm:px-6 sm:py-4 ring-1 ring-white/20"
+      className="flex items-center gap-2 rounded-full border border-black bg-white px-5 py-3 sm:px-6 sm:py-4"
       aria-label={`Base URL: ${BASE_URL}`}
     >
       <div className="flex flex-col items-start gap-0.5">
@@ -86,7 +86,7 @@ export function BaseUrlDisplay() {
         variants={item}
         onClick={handleCopy}
         aria-label={copied ? "Copied" : "Copy base URL to clipboard"}
-        className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-[#111111] transition-transform duration-200 hover:bg-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#675c56] active:scale-[0.96]"
+        className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[#111111] transition-transform duration-200 hover:bg-black/5 focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_#fff,0_0_0_5px_#0d0c12] active:scale-[0.96]"
       >
         <AnimatePresence initial={false}>
           {copied ? (

@@ -1,135 +1,142 @@
 import Image from "next/image";
-import { WordsPullUp, FadeUp } from "@/components/words-pull-up";
-import { FlowButton } from "@/components/ui/flow-button";
+import Link from "next/link";
+import { ChevronRight } from "lucide-react";
+import { MarketingShell } from "@/components/marketing/marketing-shell";
+import { PillCta } from "@/components/marketing/pill-cta";
 import { BaseUrlDisplay } from "@/components/ui/base-url-display";
-import { SpecialText } from "@/components/ui/special-text";
-import { GlassEffect, GlassFilter } from "@/components/ui/liquid-glass";
-import { ScrollVideoBackground } from "@/components/scroll-video-background";
-import { ModelDirectory } from "@/components/models/model-directory";
-import { DIRECTORY_MODELS } from "@/lib/models";
 
 export default function Home() {
   return (
-    <>
-      <ScrollVideoBackground src="https://video.korgems.com/stream/index.m3u8" />
-      <div className="relative z-10 flex flex-col flex-1 text-black">
-        {/* SECTION 1 — HERO */}
-        <section id="hero" className="relative h-screen p-4 md:p-6">
-          {/* Hero content removed */}
+    <MarketingShell overlayHeader>
+      <main>
+        <section
+          id="hero"
+          className="relative isolate min-h-dvh overflow-hidden bg-[#fe0000]"
+        >
+          <h1 className="sr-only">
+            If you have a will to create, you&apos;re an artist
+          </h1>
+          <div className="absolute inset-0">
+            <Image
+              src="/BRAND_ASSETS/hero-home.jpg"
+              alt="If you have a will to create, you're an artist. luv13, 2026."
+              fill
+              priority
+              sizes="100vw"
+              className="object-contain object-center"
+            />
+          </div>
         </section>
 
-        {/* SECTION 2 — ABOUT */}
-        {/* SECTION 3 — FEATURES */}
+        <section id="models" className="relative z-10 -mt-12 bg-transparent">
+          <div className="rounded-t-[48px] bg-[var(--section-cream)] px-6 py-20 md:px-12 md:py-28">
+            <div className="mx-auto max-w-7xl">
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-black/50 sm:text-xs">
+                Models
+              </p>
+              <h2 className="mt-4 max-w-[20ch] text-3xl font-bold tracking-tight text-black text-balance md:text-4xl">
+                Models we host
+              </h2>
+              <div className="mt-10 grid gap-4 md:grid-cols-2">
+                <Link
+                  href="/models"
+                  className="group relative rounded-[32px] bg-white p-8 md:p-12"
+                >
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-black/50 sm:text-xs">
+                    Available
+                  </p>
+                  <h3 className="mt-4 text-2xl font-bold tracking-tight text-black md:text-[1.75rem]">
+                    GLM-5.2
+                  </h3>
+                  <p className="mt-2 font-mono text-xs text-black/50">
+                    luv13-glm-5.2
+                  </p>
+                  <p className="mt-4 text-sm font-medium text-black/70 tabular-nums">
+                    $0.33 per 1M total tokens
+                  </p>
+                  <ChevronRight
+                    className="absolute bottom-8 right-8 h-5 w-5 text-black md:bottom-12 md:right-12"
+                    strokeWidth={1.5}
+                    aria-hidden="true"
+                  />
+                </Link>
+                <div className="relative rounded-[32px] bg-[var(--section-mist)] p-8 md:p-12">
+                  <span className="inline-flex rounded-full border border-black bg-white px-2.5 py-1 text-xs font-semibold text-black">
+                    Coming soon
+                  </span>
+                  <h3 className="mt-4 text-2xl font-bold tracking-tight text-black md:text-[1.75rem]">
+                    More models
+                  </h3>
+                  <p className="mt-4 max-w-sm text-sm font-medium leading-relaxed text-black/70">
+                    Each model will have its own flat rate. GLM-5.2 is live
+                    today.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section
-          id="the-model"
-          className="relative overflow-hidden px-6 py-20 md:px-12 md:py-28"
+          id="pricing"
+          className="bg-white px-6 py-20 md:px-12 md:py-28"
         >
           <div className="mx-auto max-w-7xl">
-            <ModelDirectory models={DIRECTORY_MODELS} />
+            <article className="rounded-[32px] bg-[var(--section-cream)] p-8 md:p-12">
+              <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:items-center">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-black/50 sm:text-xs">
+                    Pricing
+                  </p>
+                  <h2 className="mt-4 text-3xl font-bold tracking-tight text-black text-balance md:text-4xl">
+                    Pay per token.{" "}
+                    <span className="font-serif italic font-normal">
+                      Nothing else.
+                    </span>
+                  </h2>
+                </div>
+                <div>
+                  <p className="text-4xl font-helveticaneue-bold tracking-tight text-black tabular-nums md:text-5xl">
+                    $0.33
+                  </p>
+                  <p className="mt-2 text-sm font-medium text-black/70">
+                    per 1M total tokens
+                  </p>
+                </div>
+              </div>
+            </article>
           </div>
         </section>
 
-        {/* SECTION 4 — PRICING & API ACCESS */}
-        <section id="pricing" className="px-6 pb-20 md:px-12 md:pb-28">
-          <div className="mx-auto max-w-7xl flex flex-col gap-4">
-            {/* Pricing card */}
-            <FadeUp delay={0.15}>
-              <article className="rounded-2xl p-8 md:p-12 ring-1 ring-white/[0.08] [backdrop-filter:blur(4px)] [-webkit-backdrop-filter:blur(4px)]">
-                <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:items-center">
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-black/50 sm:text-xs">
-                      Pricing
-                    </p>
-                    <WordsPullUp
-                      as="h2"
-                      text="Pay per token. Nothing else."
-                      className="mt-4 text-2xl font-bold tracking-tight leading-tight text-black md:text-4xl"
-                    />
-                  </div>
-                  <div>
-                    <div>
-                      <p className="text-4xl font-bold tracking-tighter text-black tabular-nums md:text-5xl">
-                        $0.33
-                      </p>
-                      <p className="mt-2 text-sm font-medium text-black/70">
-                        per 1M total tokens
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </article>
-            </FadeUp>
-
-            {/* Notify card */}
-            <FadeUp delay={0.15}>
-              <article
-                id="get-notified"
-                className="rounded-2xl p-8 md:p-12 ring-1 ring-white/[0.08] [backdrop-filter:blur(4px)] [-webkit-backdrop-filter:blur(4px)]"
-              >
-                <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:items-center">
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-black/50 sm:text-xs">
-                      API access
-                    </p>
-                    <WordsPullUp
-                      as="h3"
-                      text="Create your key now."
-                      className="mt-4 text-2xl font-bold tracking-tight leading-tight text-black md:text-4xl"
-                    />
-                    <p className="mt-4 max-w-md text-sm font-medium text-black/70">
-                      Sign up with email, create an API key at $0, and add
-                      credit when you are ready to run GLM-5.2.
-                    </p>
-                  </div>
-                  <div className="flex md:justify-end">
-                    <FlowButton text="Create account" href="/signup" />
-                  </div>
-                </div>
-              </article>
-            </FadeUp>
-          </div>
-        </section>
-
-        {/* START CREATING */}
-        <section id="our-story" className="px-6 py-20 md:px-12 md:py-28">
-          <GlassFilter />
-          <div className="mx-auto max-w-6xl text-center">
-            <GlassEffect className="rounded-[40px] px-8 py-16 md:px-16 md:py-24 flex flex-col items-center justify-center">
-              <h2 className="mx-auto max-w-3xl text-3xl font-bold tracking-tight leading-[0.9] text-black sm:text-4xl sm:leading-[0.85] md:text-5xl lg:text-6xl xl:text-7xl">
-                <SpecialText
-                  className="text-3xl font-bold tracking-tight leading-[0.9] text-black sm:text-4xl sm:leading-[0.85] md:text-5xl lg:text-6xl xl:text-7xl"
-                  speed={20}
-                  inView
-                >
-                  START CREATING
-                </SpecialText>
+        <section id="api" className="bg-white">
+          <div className="rounded-t-[48px] bg-[var(--section-ink)] px-6 py-20 text-white md:px-12 md:py-28">
+            <div className="mx-auto max-w-6xl text-center">
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/50 sm:text-xs">
+                API access
+              </p>
+              <h2 className="mx-auto mt-4 max-w-[16ch] text-3xl font-helveticaneue-bold leading-[0.94] tracking-tight text-white text-balance md:text-5xl lg:text-6xl">
+                Create your key.{" "}
+                <span className="font-serif italic font-normal">Now.</span>
               </h2>
-              <FadeUp delay={0.2} className="flex justify-center mt-[60px]">
+              <p className="mx-auto mt-6 max-w-md text-pretty text-base font-medium leading-relaxed text-white/70">
+                Sign up with email, create an API key at $0, and add credit when
+                you are ready to run GLM-5.2.
+              </p>
+              <div className="mt-10 flex justify-center">
                 <BaseUrlDisplay />
-              </FadeUp>
-              <FadeUp delay={0.35} className="flex justify-center mt-[40px]">
-                <FlowButton text="Create account" href="/signup" />
-              </FadeUp>
-            </GlassEffect>
+              </div>
+              <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
+                <PillCta href="/signup" className="min-h-12">
+                  Create account
+                </PillCta>
+                <PillCta href="/login" variant="ghost" className="min-h-12">
+                  Log in
+                </PillCta>
+              </div>
+            </div>
           </div>
         </section>
-
-        {/* FOOTER */}
-        <footer className="border-t border-white/10 px-6 py-8 md:px-12">
-          <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-            <Image
-              src="/BRAND_ASSETS/LUV13.png"
-              alt="LUV13"
-              width={120}
-              height={40}
-              priority={false}
-            />
-            <p className="text-sm font-medium text-black/50">
-              © {new Date().getFullYear()} LUV13
-            </p>
-          </div>
-        </footer>
-      </div>
-    </>
+      </main>
+    </MarketingShell>
   );
 }

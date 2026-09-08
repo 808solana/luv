@@ -7,6 +7,19 @@
    Usage bridge: oklch(var(--background)) etc. in @theme inline.
    ────────────────────────────────────────────────────────────── */
 :root {
+  --ink: #0d0c12;
+  --paper: #ffffff;
+  --pill: #ffffff;
+  --pill-ink: #0d0c12;
+  --hairline: rgba(13, 12, 18, 0.12);
+  --section-cream: #f6f3ee;
+  --section-stone: #eee9e2;
+  --section-mist: #e7e4de;
+  --section-ink: #0d0c12;
+  --section-navy: #12141c;
+  --radius-card: 32px;
+  --radius-section: 48px;
+  --radius-pill: 9999px;
   --background: 1 0 0;
   --foreground: 0.141 0.004 285.824;
   --card: 1 0 0;
@@ -117,14 +130,24 @@
   --color-button: oklch(var(--primary));
   --color-surface: oklch(var(--card));
   --color-surface-2: oklch(var(--secondary));
+  --color-ink: var(--ink);
+  --color-paper: var(--paper);
+  --color-section-cream: var(--section-cream);
+  --color-section-stone: var(--section-stone);
+  --color-section-mist: var(--section-mist);
+  --color-section-ink: var(--section-ink);
+  --color-section-navy: var(--section-navy);
   --radius: var(--radius);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --radius-card: var(--radius-card);
+  --radius-section: var(--radius-section);
+  --radius-pill: 9999px;
   /* Brand fonts stay (LUV13 choice). */
   --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --font-serif: "Instrument Serif", Georgia, serif;
+  --font-serif: "Instrument Serif", Georgia, "Times New Roman", serif;
   --font-helveticaneue-bold:
     "HelveticaNeue-Bold", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
@@ -132,7 +155,9 @@
 @font-face {
   font-family: "HelveticaNeue-Bold";
   src:
-    local("Helvetica Neue Bold"), local("HelveticaNeue-Bold"),
+    url("/BRAND_ASSETS/HelveticaNeue-Bold.otf") format("opentype"),
+    local("Helvetica Neue Bold"),
+    local("HelveticaNeue-Bold"),
     local("Helvetica Neue 700");
   font-weight: 700;
   font-style: normal;
@@ -141,8 +166,13 @@
 
 html {
   scroll-behavior: smooth;
-  /* Fallback background while the video decodes, and behind transparent areas. */
   background: #000000;
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+html.splash-done {
+  background: var(--paper);
 }
 
 /* Lenis smooth-scroll setup */
@@ -164,15 +194,110 @@ html.lenis body {
 }
 
 body {
-  /* Transparent so the fixed scroll-video background shows through the whole site. */
-  background: transparent;
-  color: oklch(var(--foreground));
+  background: var(--paper);
+  color: var(--ink);
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 .font-serif-italic {
-  font-family: "Instrument Serif", Georgia, serif;
+  font-family: var(--font-serif);
   font-style: italic;
+}
+
+.pill-cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0.75rem 2rem;
+  border-radius: 9999px;
+  background: var(--pill);
+  color: var(--pill-ink);
+  border: 1px solid var(--pill-ink);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    transform 180ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pill-cta:hover {
+  transform: scale(1.02);
+  box-shadow:
+    0 0 0 3px var(--paper),
+    0 0 0 4px var(--ink);
+}
+
+.pill-cta:active {
+  transform: scale(0.96);
+  box-shadow:
+    0 0 0 0 var(--paper),
+    0 0 0 0 var(--ink);
+}
+
+.pill-cta:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px var(--paper),
+    0 0 0 5px var(--ink);
+}
+
+.pill-cta-sm {
+  min-height: 44px;
+  padding: 0.5rem 1.25rem;
+}
+
+.pill-cta-ghost {
+  background: transparent;
+  color: #ffffff;
+  border-color: #ffffff;
+}
+
+.pill-cta-ghost:hover,
+.pill-cta-ghost:focus-visible {
+  box-shadow:
+    0 0 0 3px var(--section-ink),
+    0 0 0 4px #ffffff;
+}
+
+#luv13-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000000;
+  transform: translateY(0);
+  transition: transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#luv13-splash.is-exiting {
+  transform: translateY(-100%);
+  pointer-events: none;
+}
+
+#luv13-splash img {
+  height: 48px;
+  width: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pill-cta:hover,
+  .pill-cta:active {
+    transform: none;
+    box-shadow: none;
+  }
+
+  #luv13-splash {
+    transition: none;
+  }
 }
 
 /* ──────────────────────────────────────────────────────────────

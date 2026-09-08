@@ -5,6 +5,7 @@
 - Direct, no filler. Prefers simple/simple/simple.
 - LUV13 voice is "we", not founder-centric. Avoid autobiography about the founder.
 - Treat `@BRAND_ASSETS` as the source of truth for logo and typography.
+- Canonical marketing type/surface spec: `.cursor/skills/frontend/typography.md` (Hims rhythm on LUV13 fonts/colors). Load it before any typography or marketing-UI work.
 - Do not mention OpenRouter anywhere on the public site.
 
 ## Project Facts
@@ -15,10 +16,14 @@
 - Web routes include `/`, `/signup`, `/login`, and `/dashboard`; `/keys` and `/top-up` redirect into the authenticated dashboard.
 - UI deps: `framer-motion` (animations), `lucide-react` (icons), `gsap` (installed but no longer used by the scroll-video background), `hls.js` (HLS source support — not exercised for local mp4, falls to direct src).
 - Static assets served from `web/public/` (NOT repo-root `BRAND_ASSETS/`). Copy assets into `web/public/BRAND_ASSETS/` to make them reachable at `/BRAND_ASSETS/...`.
-- `web/components/scroll-video-background.tsx`: Fixed full-page video background for the whole site (mounted in `layout.tsx`, not page.tsx). Uses a native passive `scroll` listener to set `video.currentTime = (scrollY / maxScroll) * duration`. No canvas, no frame cache, no mouse parallax. Video element uses `object-contain` (NOT `object-cover`) so the full frame is always shown at a constant zoom regardless of viewport size — `object-cover` caused an apparent "zoom in" on wide desktop screens and "zoom out" on small windows. Letterbox bars blend into the black `html` background. Loading overlay until `canplay`.
+- Fonts: Helvetica Neue + HelveticaNeue-Bold stay the sans. OTF lives at `web/public/BRAND_ASSETS/HelveticaNeue-Bold.otf` and is loaded via `@font-face` `url("/BRAND_ASSETS/HelveticaNeue-Bold.otf")` plus `local()`. Instrument Serif is the serif (Google Fonts in `web/app/layout.tsx`, roman+italic: `ital,wght@0,400;1,400`). Do not replace these with Hims webfonts.
+- Marketing remake is live: white page (`--paper`), black text (`--ink` `#0d0c12`), white `rounded-full` `.pill-cta` with 1px black border and hover “regrow” `box-shadow`. Cream / rare near-black section bands return to white. Shared chrome: `components/marketing/*`. Full-page scroll-video is no longer the page background. Homepage hero is the red poster `web/public/BRAND_ASSETS/hero-home.jpg` (`#fe0000`); do not put HTML marketing copy in that hero.
+- Splash (hard navigation / refresh only): SSR `#luv13-splash` is a black viewport overlay with a small `LUV13.png` (logo already has light outlines on black). `SplashScreen` waits for `document.fonts.ready` + `window` load, then a 220ms minimum, then `translateY(-100%)`. `prefers-reduced-motion` removes instantly. Client-side App Router navigations do not remount root layout, so the splash does not flash again. `html` starts `#000` and becomes `--paper` after `html.splash-done`.
+- `web/components/scroll-video-background.tsx` still exists but is unused by the remake homepage. If reintroduced, use it as a section treatment only — page base stays white.
+- KOR web deploy: host `/home/kor/luv13-web`, container `luv13-web`, host port **3100→3000**. Prefer tar-over-ssh to `kor` for deploys (project convention); `/usr/bin/rsync` may exist but tar excludes are safer. Do not overwrite remote `.env.production` or `docker-compose.yml`. Rebuild with `docker compose up -d --build`. NPM Host `luv13.ai` → :3100. Public DNS for `luv13.ai` may fail from this environment; verify via `curl -H "Host: luv13.ai" http://127.0.0.1:80/` on kor.
 - Background video source in `layout.tsx`: self-hosted HD HLS `https://video.korgems.com/stream/index.m3u8` (5K@24fps, single 8s segment with B-frames). Was Mux HLS `https://stream.mux.com/LtB1WEO01Zzf2x...m3u8` (blurry due to top rendition 4K + auto-level selection), switched to self-hosted for sharpness. Local `backgroundyesyes.realesrgan.mp4` and earlier `filename*.m2ts/.m3u8` files no longer present in `web/public/BRAND_ASSETS/` (only `LUV13.png` and `typography.png` remain).
 - Frame extraction cap is display-driven: `scale = min(1, innerWidth*dpr / videoWidth)` (dpr capped at 2), then clamped against a ~1GB decoded-frame budget. NOT the original fixed 1280. Extracting above display res is invisible; full 5K x ≤120 frames ≈ 7GB and crashes the tab.
-- For the video to show site-wide: `body { background: transparent }`, `html { background:#000 }`, page root is `relative z-10`. No white backgrounds anywhere on the page — all sections are transparent over the video background with white text. `liquid-glass` and `liquid-glass-strong` classes may still exist in CSS but are no longer used on page sections.
+- `liquid-glass` / `liquid-glass-strong` classes may still exist in CSS but are unused on marketing sections. Marketing CTAs use `.pill-cta`, not shadcn `--primary` blue.
 - API wallet source of truth is integer micro-dollars: `users.balance_umicro`; exact per-request reconciliation uses `requests.charge_umicro`. `requests.cost_usd` is display-only.
 - Stripe amounts remain integer cents and convert with `cents * 10_000`; GLM charges use integer floor math at `330_000` µ$ per million tokens.
 - API model configuration uses canonical `luv13-glm-5.2` plus permanent compatibility alias `luv-1`, both routing to `glm-5.2`; do not add legacy suffixed proxy slugs.
@@ -35,8 +40,9 @@
 - The customer dashboard reads cookie-scoped balance, key metadata, and recent usage; full API-key secrets exist only in transient post-create component state.
 - `GET /api/usage` returns recent session-user usage without exposing upstream model aliases or key hashes.
 - Production SSH alias is `kor`. API lives at `/home/kor/luv13-api`, proxy at `/home/kor/neuralwatt-proxy`, deployed web at `/home/kor/luv13-web` on host port 3100. Do not bind LUV13 web to host port 3000; NPM already forwards `korgems.com` there.
-- Canonical public domain is **luv13.ai** on the mini-PC only (`71.209.199.134`). Dashboard `https://luv13.ai`, API `https://api.luv13.ai`, Stripe webhook `https://api.luv13.ai/billing/webhook`, top-up `https://luv13.ai/top-up`. Cookie Domain `.luv13.ai`; CORS/`FRONTEND_URL` `https://luv13.ai` (credentialed). Do not use `luv.ai` as a live origin; AWS/Route53 for `luv.ai` was the wrong domain.
+- Canonical public domain is **luv13.ai** on the mini-PC only. Public IP re-verified 2026-09-08 as `71.209.202.110` (kor.md); older `71.209.199.134` note is stale. Dashboard `https://luv13.ai`, API `https://api.luv13.ai`, Stripe webhook `https://api.luv13.ai/billing/webhook`, top-up `https://luv13.ai/top-up`. Cookie Domain `.luv13.ai`; CORS/`FRONTEND_URL` `https://luv13.ai` (credentialed). Do not use `luv.ai` as a live origin; AWS/Route53 for `luv.ai` was the wrong domain.
 - `https://api.luv13.com` remains a working legacy hostname (PATH-0 / public metered path). Keep that operational fact. Host Cloudflare DDNS containers cover `luv13.com`, `korgems.com`, and `korwants.com` — not the `luv13.ai` zone.
+- Live `luv13-api` `billing.py` includes Stripe `managed_payments={"enabled": False}`; local scrap lagged — preserve remote on deploy.
 - Host Stripe LIVE secret and webhook signing secret are a human gate; do not invent them. Checkout success/cancel URLs must be `https://luv13.ai/top-up/success?...` and `https://luv13.ai/top-up`.
 - Live API cookie domain is `.luv13.ai` and CORS origin is `https://luv13.ai` only. Restorable origin-cutover backup: `/home/kor/luv13-api/rollback/20260814T204755Z-luv13ai-origin`. Pre-wallet backup remains `/home/kor/luv13-api/rollback/20260814T061500Z-pre-wallet`.
 - `luv13.ai` NS are Cloudflare (`etta.ns.cloudflare.com` / `tony.ns.cloudflare.com`). Public A/AAAA for `luv13.ai` and `api.luv13.ai` currently resolve to Cloudflare proxy IPs (`104.21.40.96`, `172.67.183.210`, `2606:4700:...`) — orange cloud, not DNS-only to `71.209.199.134`. Public HTTPS through Cloudflare currently returns 200 for apex and API health. `www.luv13.ai` is 520 (no NPM vhost). HTTP-01 / NPM origin certs still need grey-cloud A records to `71.209.199.134`.
@@ -74,7 +80,7 @@
 
 
 ## Curator
-- tasks_since_review: 1
+- tasks_since_review: 5
 
 # AGENTS.md — luv13
 

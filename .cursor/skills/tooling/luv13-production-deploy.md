@@ -43,3 +43,4 @@ tags: [deploy, docker, nginx-proxy-manager, sqlite, stripe]
 - 2026-08-14: Wallet API + web container deploy; NPM HTTP vhosts.
 - 2026-08-14: Domain correction — live origins are `luv13.ai` / `api.luv13.ai` on the mini-PC. Stripe LIVE keys remain a human gate. Cloudflare grey-cloud DNS is the remaining human step if records are missing or proxied.
 - 2026-08-14: Origin cutover applied on `kor` (NPM host 55 `luv13.ai`→:3100; host 34 already had `api.luv13.ai`+`api.luv13.com`). Public DNS exists but is orange-clouded.
+- 2026-09-08: Web remake (red hero) via tar-over-ssh to `/home/kor/luv13-web`; preserved `.env.production` + `docker-compose.yml`; rebuilt `luv13-web`. API scraps synced excluding live-ahead `billing.py` (`managed_payments`); proxy left alone; sanitized proxy parked at `/home/kor/luv-scraps/proxy`. Public IP confirmed `71.209.202.110`.

@@ -1,0 +1,246 @@
+LUV13_PROJECT_MEMORY.txt
+Generated: 2026-09-08
+Workspace: /Users/real/luv (macOS, zsh)
+Git remote: https://github.com/808solana/luv.git
+Purpose: Dense reloadable context for agents after context loss (~1M token concern).
+Secrets: NEVER invent Stripe/JWT/upstream keys. NEVER commit .env, config.json, DBs.
+Never print secret values. kor.md contains SSH password — treat sensitive.
+
+================================================================================
+1. WHAT LUV13 IS
+================================================================================
+- Metered LLM API reseller / hosting front. Customers buy credit, mint API keys,
+  call OpenAI-compatible /v1/chat/completions.
+- Wedge: cheaper frontier tokens via Neuralwatt account-pool pricing, passed through.
+  Positioning: cheapest access; tourist-simple + purist-API. Voice: "we".
+- Do NOT name OpenRouter on the public site.
+- Launch model: GLM-5.2 as public id luv13-glm-5.2 (compat alias luv-1 → upstream glm-5.2).
+  Sell rate: 330_000 µ$ per million total tokens ($0.33/M).
+- Audience: coding-agent users, pay-as-you-go tourists, investors.
+- Honest risk: if Neuralwatt raises prices or clamps multi-account use, wedge narrows.
+
+================================================================================
+2. ARCHITECTURE (LIVE)
+================================================================================
+Browser / Cursor / OpenAI client
+        |
+        v
+  luv13-web (Next.js 16)     marketing + auth UI + dashboard
+        |  cookies credentials:"include"
+        v
+  luv13-api (FastAPI :4100)  THE PRODUCT — auth, wallet, keys, metering, Stripe, SSE
+        |  Bearer upstream_api_key
+        v
+  luv13-proxy (Flask/Gunicorn -w1 :4000)  DUMB PIPE — rotation, stream, stall detect
+        |
+        v
+  Neuralwatt
+
+Containers on host `kor` (Debian 13):
+  luv13-web     3100→3000
+  luv13-api     4100→4100
+  luv13-proxy   4000→4000
+TLS/routing: nginx-proxy-manager :80/:81/:443.
+Same box also runs Hermes, AgentDesk, Portainer, DDNS, etc. — do not kill casually.
+
+Local monorepo:
+  web/    active Next.js remake
+  api/    sanitized FastAPI scraps (wallet phases)
+  proxy/  sanitized Neuralwatt scraps (UPSTREAM KEYS REDACTED — do not overwrite live)
+  docs/   SPEC, PLAN, PRODUCTION_SOURCE_IMPORT, …
+  kor.md  server briefing / deploy bible
+from-thinking-to-coding/ is MISSING from this workspace (skills refs may 404).
+
+================================================================================
+3. WEB FACT SHEET
+================================================================================
+Stack: Next.js 16 App Router, React 19, TypeScript, Tailwind v4 (CSS-first),
+  output standalone. framer-motion, lucide-react, hls.js; gsap unused by remake home.
+Local:  /Users/real/luv/web
+Remote: /home/kor/luv13-web
+Container: luv13-web
+Public: https://luv13.ai (NPM → :3100). www.luv13.ai may 520 without www vhost.
+Do NOT bind LUV13 web to host :3000 (korgems uses it).
+
+Routes: / /models /signup /login /dashboard; /keys /top-up → dashboard;
+  GET /api/health; POST /api/notify (Resend).
+Client: web/lib/api.ts → NEXT_PUBLIC_LUV13_API_BASE default https://api.luv13.ai,
+  always credentials include. Full API keys = transient state only.
+
+Brand assets: web/public/BRAND_ASSETS/
+  LUV13.png, HelveticaNeue-Bold.otf, typography.png, hero-home.jpg
+
+CURRENT UI (red hero remake):
+  - Homepage hero: full-bleed red #fe0000 + /BRAND_ASSETS/hero-home.jpg
+  - NO HTML marketing copy in hero (sr-only h1 only)
+  - MarketingShell overlayHeader=true → transparent overlay header on homepage
+  - Rest of page: white/cream (--paper), ink #0d0c12
+  - Shared chrome: components/marketing/{marketing-shell,site-header,site-footer,
+    overlay-menu,pill-cta}. White .pill-cta, 1px black border, hover regrow shadow
+  - Splash: black #luv13-splash + SplashScreen; hard nav/refresh only
+  - Fonts: Helvetica Neue Bold + Instrument Serif (italic Menu/emphasis)
+  - Canonical skill: .cursor/skills/frontend/typography.md
+  - scroll-video-background.tsx exists but unused on remake homepage
+  - Never put internal provider/model slugs on public site beyond luv13-glm-5.2
+    and https://api.luv13.ai
+
+Protected remote web files (NEVER overwrite):
+  .env.production
+  docker-compose.yml
+
+================================================================================
+4. API FACT SHEET (authoritative)
+================================================================================
+luv13-api = FastAPI product layer :4100.
+Local:  /Users/real/luv/api
+Remote: /home/kor/luv13-api
+Container: luv13-api
+Public: https://api.luv13.ai  (legacy still live: https://api.luv13.com)
+Health: GET /health
+
+Auth: bcrypt email/password + optional Google OAuth + cookie luv13_session
+  Domain=.luv13.ai HttpOnly Secure SameSite=Lax. Dual auth on /api/keys
+  (cookie OR X-Admin-Secret). /internal/* admin-only.
+
+Wallet: users.balance_umicro (source of truth).
+  charge: requests.charge_umicro; requests.cost_usd display-only.
+  Key money math:
+    cents * 10_000 = umicro
+    charge floor (tokens * rate_umicro_per_million) // 1_000_000
+    reserve est_input + 8000 output tokens under BEGIN IMMEDIATE
+    402 when insufficient; top-up https://luv13.ai/top-up
+  Settlement idempotent across complete/error/cancel/forced-cut.
+  Stripe Checkout creates pending top-up; ONLY signature-verified paid
+  checkout.session.completed webhook credits. Redirects never credit.
+  Idempotency: luv13-topup-{id}.
+
+Models: luv13-glm-5.2 + luv-1 → glm-5.2 @ 330000 µ$/M.
+Endpoints: auth/*, api/keys, api/usage, billing/*, v1/chat/completions, internal/*.
+SQLite: data/luv13.db (bind-mounted). app/ NOT volume-mounted → rebuild to ship.
+config.json bind-mounted RO → restart only. .env via env_file mode 600.
+
+Tests: api/tests/test_phase4.py, test_phase5.py, test_billing.py, e2e.py.
+
+Deploy API: sync app/ (+ Dockerfile, requirements.txt) only; EXCLUDE .env,
+  config.json, data/, .git. Prefer not clobbering live docker-compose.yml.
+
+Known host vs local (2026-09-08):
+  All app/*.py SAME except billing.py — REMOTE has extra Stripe param
+  managed_payments={"enabled": False}. Preserve remote billing.py; do not
+  regress with older local scrap. Local scrap still missing that line.
+
+Risks: PATH-0 upstream_api_key must exist in proxy DB; Stripe LIVE human gate;
+  parallel tool-call SSE freeze suspicion in _stream_chat; doc drift float vs umicro.
+
+Protected remote API: .env, config.json, data/*, rollback/ (root 0700).
+
+================================================================================
+5. PROXY + KOR FACT SHEET (authoritative)
+================================================================================
+Proxy = dumb pipe Flask/Gunicorn -w1 :4000 at /home/kor/neuralwatt-proxy.
+Container: luv13-proxy.
+Do NOT put billing/auth there. Do NOT rebuild proxy unless explicitly asked.
+Local proxy/ is sanitized (keys redacted). Hash mismatch with live is EXPECTED
+and protective — never rsync/tar local proxy.py over live.
+Sanitized scraps parked (2026-09-08): /home/kor/luv-scraps/proxy
+
+SSH: alias `kor`. Prefer Tailscale 100.90.62.96.
+Public IP RE-VERIFIED 2026-09-08 via ifconfig.me on host: 71.209.202.110
+  (matches kor.md). Older notes citing 71.209.199.134 are stale.
+LAN: 192.168.0.150. User: kor. OS: Debian 13 (trixie).
+
+Hermes lives on this box — do not kill gateway/containers casually; never docker rm
+without commit/cp first.
+
+Mac deploy: Prefer tar-over-ssh (project convention):
+  tar czf - --exclude=... | ssh kor 'cd DEST && tar xzf -'
+(/usr/bin/rsync may exist; still prefer tar excludes for protected files.)
+
+Web rebuild:  cd /home/kor/luv13-web && docker compose up -d --build
+API rebuild:  cd /home/kor/luv13-api && docker compose up -d --build
+Config-only:  edit config.json → docker restart luv13-api
+
+Verify:
+  docker ps --filter name=luv13
+  curl -sI https://www.luv13.ai/login | head -1
+  curl -sS http://127.0.0.1:4100/health          # on kor
+  curl -sS http://127.0.0.1:3100/api/health
+  curl -H "Host: luv13.ai" http://127.0.0.1:80/  # on kor if public DNS fails
+  curl -sS https://api.luv13.ai/health
+  Leave proxy alone (created-at unchanged).
+
+================================================================================
+6. DOMAINS / PORTS
+================================================================================
+Canonical:
+  https://luv13.ai            web/dashboard
+  https://api.luv13.ai        API + Stripe webhook /billing/webhook
+  Cookie Domain .luv13.ai; CORS/FRONTEND_URL https://luv13.ai
+Legacy: https://api.luv13.com still works.
+www.luv13.ai: may 520 without NPM www vhost — prefer apex or documented checks.
+Cloudflare orange-cloud A records common (104.x/172.x); HTTP-01 needs grey-cloud
+  to origin. DDNS containers cover luv13.com/korgems/korwants — not necessarily luv13.ai zone.
+Do not use luv.ai as live origin.
+
+Ports: 22 ssh · 80/81/443 NPM · 3100 web · 4000 proxy · 4100 api · 3000 other site.
+
+================================================================================
+7. MONEY / WALLET ONE-LINER
+================================================================================
+$1 loaded = $1 credit. GLM burn $0.33/M total tokens. Pre-reserve + mid/post settle
+in luv13-api only. Stripe webhook is the only credit path. Top-up UI:
+https://luv13.ai/top-up (custom amount + pills → one checkout path).
+
+================================================================================
+8. OPEN RISKS / BLOCKERS
+================================================================================
+- PATH-0: metered path 401s if upstream_api_key missing from proxy DB — verify before
+  claiming e2e metering works. Not re-tested this deploy (no customer Bearer call).
+- Stripe LIVE secret + webhook secret = human gate on host .env (presence not printed).
+- Parallel tool-call SSE reassembly bug risk in API relay.
+- Password reset / email verification missing.
+- Public apex DNS may fail from some agent envs; use on-box Host-header probe.
+- Local billing scrap lags remote (managed_payments) — preserve remote.
+- kor.md plaintext credentials — rotate if leaked; never paste publicly.
+- from-thinking-to-coding skills folder absent in workspace.
+- Note: PROJECT_CONTEXT.md / several PLAN*.md were deleted from local tree mid-session
+  by other workspace activity; this file is the consolidated recovery dump.
+
+================================================================================
+9. RECENT LOCAL CHANGES + DEPLOY DONE 2026-09-08
+================================================================================
+Web remake shipped to kor:
+  - Red poster hero-home.jpg; HTML hero copy removed; overlayHeader; marketing/*
+  - Splash; globals/layout/models/page updates
+  - tar → /home/kor/luv13-web (excluded .env.production, docker-compose.yml)
+  - docker compose up -d --build → luv13-web recreated
+  - Verified: :3100/ 200, /api/health 200, hero-home.jpg 200 size 46881,
+    Host:luv13.ai → :80 200, www.luv13.ai/login 200, homepage HTML has
+    hero-home.jpg + bg-[#fe0000] + luv13-splash + overlay header
+
+API:
+  - Synced Dockerfile/requirements/app/tests excluding billing.py
+  - Preserved live billing.py md5 0f4f9c35… (managed_payments fix)
+  - Did NOT rebuild luv13-api (app code already matched except billing kept remote)
+  - :4100/health 200; api.luv13.ai + api.luv13.com health 200
+
+Proxy:
+  - Live neuralwatt-proxy NOT touched (created 2026-08-27)
+  - Sanitized scraps parked at /home/kor/luv-scraps/proxy
+
+Protected files untouched:
+  /home/kor/luv13-web/.env.production (48 bytes)
+  /home/kor/luv13-web/docker-compose.yml
+  /home/kor/luv13-api/.env and config.json (not overwritten)
+
+================================================================================
+10. QUICK CHECKLIST
+================================================================================
+[ ] Read kor.md + AGENT_MEMORY.md + this file
+[ ] Never invent secrets; never overwrite protected env/compose/config/data
+[ ] Web → tar to luv13-web → compose up -d --build → verify curls
+[ ] API app only if local ahead; preserve remote Stripe fixes
+[ ] Proxy: leave alone unless user explicitly asks
+[ ] Show docker ps + curl evidence; never fabricate
+
+END OF LUV13_PROJECT_MEMORY.txt

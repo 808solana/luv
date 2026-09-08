@@ -24,9 +24,10 @@ web/
 │   ├── keys/page.tsx                # Compatibility redirect
 │   ├── top-up/page.tsx              # Dashboard modal redirect
 │   ├── globals.css                  # Tailwind v4 + brand tokens
-│   ├── layout.tsx                   # root layout, metadata, fonts, video bg
+│   ├── layout.tsx                   # root layout, fonts, splash overlay
 │   └── page.tsx                     # marketing home page
 ├── components/
+│   ├── marketing/                   # header, overlay menu, pills, footer
 │   ├── auth/                        # Signup/login UI
 │   ├── dashboard/                   # Account dashboard UI
 │   ├── notify-form.tsx              # email capture form
@@ -79,11 +80,9 @@ Copy `.env.example` to `.env.local` and fill in for local development. Productio
 ## Brand Constraints
 
 - Logo: `public/BRAND_ASSETS/LUV13.png`.
-- Typography: `Helvetica Neue`, fall back to `Helvetica`, `Arial`, sans-serif. Use bold weight for headings/buttons.
-- Colors:
-  - Background: white `#ffffff`.
-  - Text: `#0d0c12`.
-  - Button background: `#675c56`.
+- Canonical type/surface spec: `../.cursor/skills/frontend/typography.md`.
+- Typography: Helvetica Neue / HelveticaNeue-Bold for UI and headlines; Instrument Serif for italic emphasis and overlay “Menu”.
+- Colors: page white `#ffffff`, text `#0d0c12`, marketing CTAs white pills with black type (`.pill-cta`). Do not use shadcn `--primary` blue for marketing buttons.
 - Voice: "we". No founder biography. Simple, direct, no hype.
 
 ## API Section User Flow
@@ -124,3 +123,13 @@ Do not proceed to the next phase until the user confirms the current phase works
 6. Ask the user whether to commit before continuing.
 
 Never say "should work" or "probably works." Show that it works.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

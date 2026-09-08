@@ -10,9 +10,11 @@ LUV13 is an LLM hosting service with a marketing site, email/password customer a
 
 ## Brand Source of Truth
 - Logo: `BRAND_ASSETS/LUV13.png`
-- Typography: `BRAND_ASSETS/typography.png`
-- Font: Helvetica Neue Bold (fallback Helvetica / Arial / sans-serif). `--font-sans`/`--font-serif`/`--font-helveticaneue-bold` in `@theme inline` STAY (LUV13 brand fonts); the Vercel theme ships its own `--font-sans` `General Sans` but LUV13 overrides it post-bridge.
-- Colors: **OVERRIDDEN** by Serafim "Vercel" 21st.dev theme (oklch). Old literals → new theme-bridged references:
+- Specimen: `BRAND_ASSETS/typography.png`
+- **Canonical remake spec:** `.cursor/skills/frontend/typography.md` — Hims-inspired pairing, type scale, white-page section rhythm, white-pill “regrow” CTAs, and the black splash overlay. Follow that file for all later typography/marketing UI work. The remake is implemented on `/` and `/models` plus shared marketing chrome; dashboard/auth keep their existing density. Homepage `/` hero is the red poster `/BRAND_ASSETS/hero-home.jpg` on `#fe0000`; remaining sections stay white/cream.
+- Font: Helvetica Neue Bold (fallback Helvetica / Arial / sans-serif) for UI and headlines; Instrument Serif for italic emphasis and overlay “Menu”. `--font-sans`/`--font-serif`/`--font-helveticaneue-bold` in `@theme inline` STAY (LUV13 brand fonts); the Vercel theme ships its own `--font-sans` `General Sans` but LUV13 overrides it post-bridge.
+- Marketing remake colors: page white `#ffffff`, text `#0d0c12`, pills white with black type. Do not use shadcn `--primary` blue or old `#675c56` for marketing CTAs.
+- Colors currently in CSS: **OVERRIDDEN** by Serafim "Vercel" 21st.dev theme (oklch). Old literals → new theme-bridged references:
   - Background: `#ffffff` → `oklch(var(--background))` (light `1 0 0` white; dark `0.141 0.004 285.824` near-black)
   - Foreground: `#0d0c12` → `oklch(var(--foreground))` (light `0.141 0.004 285.824`; dark `0.968 0.001 286.375`)
   - Button: `#675c56` → `oklch(var(--primary))` (`0.485 0.291 264.121` — a vivid blue, same in light/dark)
