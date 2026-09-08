@@ -14,8 +14,8 @@ Never print secret values. kor.md contains SSH password — treat sensitive.
 - Wedge: cheaper frontier tokens via Neuralwatt account-pool pricing, passed through.
   Positioning: cheapest access; tourist-simple + purist-API. Voice: "we".
 - Do NOT name OpenRouter on the public site.
-- Launch model: GLM-5.2 as public id luv13-glm-5.2 (compat alias luv-1 → upstream glm-5.2).
-  Sell rate: 330_000 µ$ per million total tokens ($0.33/M).
+- Launch model: GLM-5.2 as public id luv13-glm-5.2 (compat alias luv-1 -> upstream glm-5.2).
+  Sell rate: 330_000 micro-dollars per million total tokens ($0.33/M).
 - Audience: coding-agent users, pay-as-you-go tourists, investors.
 - Honest risk: if Neuralwatt raises prices or clamps multi-account use, wedge narrows.
 
@@ -36,10 +36,10 @@ Browser / Cursor / OpenAI client
         v
   Neuralwatt
 
-Containers on host `kor` (Debian 13):
-  luv13-web     3100→3000
-  luv13-api     4100→4100
-  luv13-proxy   4000→4000
+Containers on host kor (Debian 13):
+  luv13-web     3100->3000
+  luv13-api     4100->4100
+  luv13-proxy   4000->4000
 TLS/routing: nginx-proxy-manager :80/:81/:443.
 Same box also runs Hermes, AgentDesk, Portainer, DDNS, etc. — do not kill casually.
 
@@ -47,8 +47,9 @@ Local monorepo:
   web/    active Next.js remake
   api/    sanitized FastAPI scraps (wallet phases)
   proxy/  sanitized Neuralwatt scraps (UPSTREAM KEYS REDACTED — do not overwrite live)
-  docs/   SPEC, PLAN, PRODUCTION_SOURCE_IMPORT, …
+  docs/   SPEC, PLAN, PRODUCTION_SOURCE_IMPORT, ...
   kor.md  server briefing / deploy bible
+  context/ and idk/ may hold swept docs; prefer this memory file as recovery dump.
 from-thinking-to-coding/ is MISSING from this workspace (skills refs may 404).
 
 ================================================================================
@@ -59,12 +60,12 @@ Stack: Next.js 16 App Router, React 19, TypeScript, Tailwind v4 (CSS-first),
 Local:  /Users/real/luv/web
 Remote: /home/kor/luv13-web
 Container: luv13-web
-Public: https://luv13.ai (NPM → :3100). www.luv13.ai may 520 without www vhost.
+Public: https://luv13.ai (NPM -> :3100). www.luv13.ai may 520 without www vhost.
 Do NOT bind LUV13 web to host :3000 (korgems uses it).
 
-Routes: / /models /signup /login /dashboard; /keys /top-up → dashboard;
+Routes: / /models /signup /login /dashboard; /keys /top-up -> dashboard;
   GET /api/health; POST /api/notify (Resend).
-Client: web/lib/api.ts → NEXT_PUBLIC_LUV13_API_BASE default https://api.luv13.ai,
+Client: web/lib/api.ts -> NEXT_PUBLIC_LUV13_API_BASE default https://api.luv13.ai,
   always credentials include. Full API keys = transient state only.
 
 Brand assets: web/public/BRAND_ASSETS/
@@ -73,7 +74,7 @@ Brand assets: web/public/BRAND_ASSETS/
 CURRENT UI (red hero remake):
   - Homepage hero: full-bleed red #fe0000 + /BRAND_ASSETS/hero-home.jpg
   - NO HTML marketing copy in hero (sr-only h1 only)
-  - MarketingShell overlayHeader=true → transparent overlay header on homepage
+  - MarketingShell overlayHeader=true -> transparent overlay header on homepage
   - Rest of page: white/cream (--paper), ink #0d0c12
   - Shared chrome: components/marketing/{marketing-shell,site-header,site-footer,
     overlay-menu,pill-cta}. White .pill-cta, 1px black border, hover regrow shadow
@@ -114,10 +115,10 @@ Wallet: users.balance_umicro (source of truth).
   checkout.session.completed webhook credits. Redirects never credit.
   Idempotency: luv13-topup-{id}.
 
-Models: luv13-glm-5.2 + luv-1 → glm-5.2 @ 330000 µ$/M.
+Models: luv13-glm-5.2 + luv-1 -> glm-5.2 @ 330000 umicro/M.
 Endpoints: auth/*, api/keys, api/usage, billing/*, v1/chat/completions, internal/*.
-SQLite: data/luv13.db (bind-mounted). app/ NOT volume-mounted → rebuild to ship.
-config.json bind-mounted RO → restart only. .env via env_file mode 600.
+SQLite: data/luv13.db (bind-mounted). app/ NOT volume-mounted -> rebuild to ship.
+config.json bind-mounted RO -> restart only. .env via env_file mode 600.
 
 Tests: api/tests/test_phase4.py, test_phase5.py, test_billing.py, e2e.py.
 
@@ -144,7 +145,7 @@ Local proxy/ is sanitized (keys redacted). Hash mismatch with live is EXPECTED
 and protective — never rsync/tar local proxy.py over live.
 Sanitized scraps parked (2026-09-08): /home/kor/luv-scraps/proxy
 
-SSH: alias `kor`. Prefer Tailscale 100.90.62.96.
+SSH: alias kor. Prefer Tailscale 100.90.62.96.
 Public IP RE-VERIFIED 2026-09-08 via ifconfig.me on host: 71.209.202.110
   (matches kor.md). Older notes citing 71.209.199.134 are stale.
 LAN: 192.168.0.150. User: kor. OS: Debian 13 (trixie).
@@ -158,7 +159,7 @@ Mac deploy: Prefer tar-over-ssh (project convention):
 
 Web rebuild:  cd /home/kor/luv13-web && docker compose up -d --build
 API rebuild:  cd /home/kor/luv13-api && docker compose up -d --build
-Config-only:  edit config.json → docker restart luv13-api
+Config-only:  edit config.json -> docker restart luv13-api
 
 Verify:
   docker ps --filter name=luv13
@@ -189,7 +190,7 @@ Ports: 22 ssh · 80/81/443 NPM · 3100 web · 4000 proxy · 4100 api · 3000 oth
 ================================================================================
 $1 loaded = $1 credit. GLM burn $0.33/M total tokens. Pre-reserve + mid/post settle
 in luv13-api only. Stripe webhook is the only credit path. Top-up UI:
-https://luv13.ai/top-up (custom amount + pills → one checkout path).
+https://luv13.ai/top-up (custom amount + pills -> one checkout path).
 
 ================================================================================
 8. OPEN RISKS / BLOCKERS
@@ -203,8 +204,9 @@ https://luv13.ai/top-up (custom amount + pills → one checkout path).
 - Local billing scrap lags remote (managed_payments) — preserve remote.
 - kor.md plaintext credentials — rotate if leaked; never paste publicly.
 - from-thinking-to-coding skills folder absent in workspace.
-- Note: PROJECT_CONTEXT.md / several PLAN*.md were deleted from local tree mid-session
-  by other workspace activity; this file is the consolidated recovery dump.
+- Concurrent workspace churn: .gitignore was briefly mangled to "nothering" and docs
+  swept into idk/; this memory file is the consolidated recovery dump. Prefer also
+  keeping a copy on kor:/home/kor/LUV13_PROJECT_MEMORY.txt.
 
 ================================================================================
 9. RECENT LOCAL CHANGES + DEPLOY DONE 2026-09-08
@@ -212,20 +214,20 @@ https://luv13.ai/top-up (custom amount + pills → one checkout path).
 Web remake shipped to kor:
   - Red poster hero-home.jpg; HTML hero copy removed; overlayHeader; marketing/*
   - Splash; globals/layout/models/page updates
-  - tar → /home/kor/luv13-web (excluded .env.production, docker-compose.yml)
-  - docker compose up -d --build → luv13-web recreated
+  - tar -> /home/kor/luv13-web (excluded .env.production, docker-compose.yml)
+  - docker compose up -d --build -> luv13-web recreated
   - Verified: :3100/ 200, /api/health 200, hero-home.jpg 200 size 46881,
-    Host:luv13.ai → :80 200, www.luv13.ai/login 200, homepage HTML has
+    Host:luv13.ai -> :80 200, www.luv13.ai/login 200, homepage HTML has
     hero-home.jpg + bg-[#fe0000] + luv13-splash + overlay header
 
 API:
   - Synced Dockerfile/requirements/app/tests excluding billing.py
-  - Preserved live billing.py md5 0f4f9c35… (managed_payments fix)
-  - Did NOT rebuild luv13-api (app code already matched except billing kept remote)
+  - Preserved live billing.py md5 0f4f9c3502c43c0f383bcf4158fdc0f2 (managed_payments)
+  - Did NOT rebuild luv13-api (running app already matched; billing kept remote-ahead)
   - :4100/health 200; api.luv13.ai + api.luv13.com health 200
 
 Proxy:
-  - Live neuralwatt-proxy NOT touched (created 2026-08-27)
+  - Live neuralwatt-proxy NOT touched (created 2026-08-27T10:27:14Z)
   - Sanitized scraps parked at /home/kor/luv-scraps/proxy
 
 Protected files untouched:
@@ -233,12 +235,18 @@ Protected files untouched:
   /home/kor/luv13-web/docker-compose.yml
   /home/kor/luv13-api/.env and config.json (not overwritten)
 
+Commands pattern used:
+  cd web && tar czf - --exclude=./node_modules --exclude=./.next --exclude=./.git \
+    --exclude=./.env --exclude=./.env.local --exclude=./.env.production \
+    --exclude=./docker-compose.yml . | ssh kor 'cd /home/kor/luv13-web && tar xzf -'
+  ssh kor 'cd /home/kor/luv13-web && docker compose up -d --build'
+
 ================================================================================
 10. QUICK CHECKLIST
 ================================================================================
 [ ] Read kor.md + AGENT_MEMORY.md + this file
 [ ] Never invent secrets; never overwrite protected env/compose/config/data
-[ ] Web → tar to luv13-web → compose up -d --build → verify curls
+[ ] Web -> tar to luv13-web -> compose up -d --build -> verify curls
 [ ] API app only if local ahead; preserve remote Stripe fixes
 [ ] Proxy: leave alone unless user explicitly asks
 [ ] Show docker ps + curl evidence; never fabricate
