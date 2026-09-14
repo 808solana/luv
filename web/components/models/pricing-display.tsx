@@ -1,21 +1,21 @@
 import {
-  formatTotalPricePerMillion,
+  formatCardPrice,
   type DirectoryModel,
 } from "@/lib/model-directory";
 
 export function PricingDisplay({ model }: { model: DirectoryModel }) {
-  const unavailable =
-    formatTotalPricePerMillion(model) === "Pricing unavailable";
+  const label = formatCardPrice(model);
+  const unavailable = label === "Pricing unavailable";
 
   return (
     <div className="min-w-0">
       <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-black/45">
-        Total price
+        Price
       </p>
       <p
-        className={`mt-1 text-sm font-semibold ${unavailable ? "text-black/50" : "text-black"}`}
+        className={`mt-1 text-sm font-semibold tabular-nums ${unavailable ? "text-black/50" : "text-black"}`}
       >
-        {formatTotalPricePerMillion(model)}
+        {label}
       </p>
     </div>
   );

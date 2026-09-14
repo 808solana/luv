@@ -1,46 +1,78 @@
 ---
 name: luv13-production-deploy
-description: Use when deploying LUV13 API/web to the kor mini-PC. Backs up SQLite/NPM, merges live config, and does not invent Stripe or DNS.
+description: Use when deploying LUV13 web/API to SSH host kor (Debian 13 mini-PC, Tailscale). Tar-over-ssh, preserve live secrets, rebuild luv13-web. Do not invent Stripe or DNS.
 created: 2026-08-14
-updated: 2026-08-14
-tags: [deploy, docker, nginx-proxy-manager, sqlite, stripe]
+updated: 2026-09-13
+tags: [deploy, docker, kor, tailscale, nginx-proxy-manager, sqlite, stripe]
 ---
 
 # LUV13 Production Deploy
 
 ## When to Use
-- Shipping `api/` or `web/` to SSH host `kor`.
-- Merging live `config.json` into the per-model integer-rate shape.
-- Adding NPM vhosts for `luv13.ai` / `api.luv13.ai` without breaking `api.luv13.com`.
-- Don't use for proxy-DB writes (PATH-0 only, already done) or inventing secrets.
+- Shipping current local `web/` (or full tree) to SSH host `kor`.
+- Rebuilding the live site container after local UI changes.
+- API deploys that must merge live `config.json` / preserve Stripe.
+- Don't use for proxy-DB writes or inventing secrets. Don't use when Tailscale/`ssh kor` is down — wait for the overlay.
 
-## Steps
-1. Record predeploy revisions. Copy `config.json`, `.env`, `app/`, Dockerfile, and NPM `database.sqlite` + the affected `proxy_host/*.conf` into `/home/kor/luv13-api/rollback/<stamp>/`.
-2. Inside `luv13-api`, `PRAGMA wal_checkpoint(FULL)` then `VACUUM INTO` a backup DB. `PRAGMA integrity_check` must be `ok` and row counts must match live before continuing.
-3. Merge live `config.json` in place: convert string model routes to `{upstream, rate_umicro_per_million}` objects, add `luv13-glm-5.2` from `luv-1`→`glm-5.2`, keep `upstream_api_key` / `admin_secret` / `upstream_root` byte-identical. Never copy local example secrets onto the host.
-4. Update only routing env keys (`COOKIE_DOMAIN`, `FRONTEND_URL`, `FORWARDED_ALLOW_IPS`, Stripe success/cancel URLs). Leave `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` absent if empty.
-5. Stream a tar of `api/app`, Dockerfile, `requirements.txt` over SSH. Exclude `.env`, `config.json`, `data/`, `.git`. `docker compose up -d --build` from `/home/kor/luv13-api`.
-6. Deploy web to `/home/kor/luv13-web` on host port **3100**, not 3000. NPM already forwards `korgems.com` to 3000.
-7. NPM sqlite and nginx confs are root-owned; edit with sudo. Reload only after `nginx -t`. HTTP-only vhosts are expected until public DNS exists for Let's Encrypt.
-8. Smoke without printing secrets: `/health`, 402 at zero balance, one funded 200, `https://api.luv13.com/health`, HLS. Use `docker exec -i` when piping a Python script.
+## Host map
+- SSH: `Host kor` in `~/.ssh/config` → Tailscale `100.90.62.96`, user `kor`, key `~/.ssh/id_ed25519_homelab`. Public IP `71.209.202.110`. OS Debian 13 (trixie). Briefing `idk/kor.md` (credentials — never paste).
+- **No container named `luv13` or `lub13`.** Live website is **`luv13-web`** (`3100→3000`). API `luv13-api` (`4100`). Proxy `luv13-proxy` (`4000`).
+- Paths: live web `/home/kor/luv13-web`, live API `/home/kor/luv13-api`, proxy `/home/kor/neuralwatt-proxy`, source dump `/home/kor/luv`.
+- Do not bind LUV13 web to host `:3000` (korgems uses it). NPM `luv13.ai` → `:3100`.
+
+## Steps (web / “push all the code”)
+1. `ssh -o BatchMode=yes -o ConnectTimeout=15 kor 'hostname; docker ps --filter name=luv13'`. If Tailscale is off, stop and ask; do not fall back to printing passwords.
+2. Optional full-tree dump to `/home/kor/luv` (source snapshot, not the running image).
+3. Stream web with macOS `COPYFILE_DISABLE=1`. Exclude `node_modules`, `.next`, `.git`, `.env*`, `docker-compose.yml`. Preserve remote `.env.production` + `docker-compose.yml`.
+4. `cd /home/kor/luv13-web && docker compose up -d --build`. Recreates **`luv13-web` only**.
+5. Smoke on-box: `:3100/api/health`, `:3100/`, Host-header `luv13.ai` on `:80`. Confirm `luv13-api` / `luv13-proxy` Created timestamps unchanged unless those services were in scope.
+
+```
+export COPYFILE_DISABLE=1
+cd /Users/real/luv/web
+tar czf - --exclude='node_modules' --exclude='.next' --exclude='.git' \
+  --exclude='.env' --exclude='.env.local' --exclude='.env.production' \
+  --exclude='docker-compose.yml' --exclude='.DS_Store' .
+  | ssh kor 'cd /home/kor/luv13-web && tar xzf -'
+ssh kor 'cd /home/kor/luv13-web && docker compose up -d --build'
+```
+
+## Steps (API — only when local is ahead)
+1. Rollback copy of live `.env` / `config.json` / DB into `/home/kor/luv13-api/rollback/<stamp>/`.
+2. WAL checkpoint + `VACUUM INTO`; integrity_check `ok`.
+3. Tar `api/app` + Dockerfile + `requirements.txt`. Exclude `.env`, `config.json`, `data/`, `.git`. **Do not overwrite live `app/billing.py` if remote still has Stripe `managed_payments` and local does not.**
+4. `cd /home/kor/luv13-api && docker compose up -d --build`. Config-only edits: `docker restart luv13-api`.
+5. Never copy local `proxy/` onto `/home/kor/neuralwatt-proxy`.
 
 ## Pitfalls
-- Canonical domain is `luv13.ai` on the mini-PC (`71.209.199.134`). Do not invent AWS or use `luv.ai` as a live origin. HTTP-01/NPM certs need Cloudflare DNS-only (grey cloud) A records for `luv13.ai` and `api.luv13.ai`.
-- Host-header probes on `:80` can pass while public HTTPS still fails for missing DNS/certs.
-- `luv13.ai` / `api.luv13.ai` DNS may exist but be Cloudflare-orange-clouded (`104.x`/`172.x`). HTTP-01 needs grey-cloud A records to `71.209.199.134`. Orange-cloud + Cloudflare certs can still serve HTTPS without NPM LE.
-- Rollback dir `/home/kor/luv13-api/rollback` is root `0700`; list backups with sudo.
-- `docker exec luv13-api python - <<'PY'` without `-i` silently eats the script.
-- Cookie `Domain=.luv13.ai` is ignored by browsers on `api.luv13.com`; cross-subdomain sessions need `api.luv13.ai` HTTPS.
+- Speech “luv13” / typo “lub13” = container `luv13-web`, not a rename. Do not `docker rename`.
+- Stale notes citing `71.209.199.134` are wrong; origin is `71.209.202.110`.
+- Local API scrap can lag live `billing.py`. Prefer dump-to-`/home/kor/luv` over clobbering `/home/kor/luv13-api`.
+- `kor.md` has SSH password — exclude it from dumps; never echo it.
+- macOS tar writes `LIBARCHIVE.xattr.*` warnings on Debian; harmless. `COPYFILE_DISABLE=1` avoids `._*` AppleDouble files.
+- Public DNS may fail from the agent env; use `curl -H "Host: luv13.ai" http://127.0.0.1:80/` on kor.
+- `docker compose up` in `/home/kor/luv13-web` must not restart Hermes, AgentDesk, or the proxy.
 
 ## Verification
-- [ ] Rollback directory contains a restorable DB with matching pre-migrate counts.
-- [ ] `curl http://127.0.0.1:4100/health` and `https://api.luv13.com/health` return 200 after rebuild.
-- [ ] Live models shape has positive integer `rate_umicro_per_million` for `luv-1` and `luv13-glm-5.2`.
-- [ ] Proxy container created-at is unchanged.
-- [ ] Stripe secret presence is reported as absent-or-present, never printed.
+- [ ] `docker ps --filter name=luv13-web` is Up on `3100→3000`
+- [ ] `curl http://127.0.0.1:3100/api/health` → 200
+- [ ] Homepage HTML contains the current local markers (not the previous hero/splash)
+- [ ] `curl -H "Host: luv13.ai" http://127.0.0.1:80/` → 200
+- [ ] Proxy Created timestamp unchanged unless proxy was in scope
+- [ ] Live `.env.production` / API `.env` / `config.json` / `data/` not overwritten
 
 ## Usage
+- count: 7
 - 2026-08-14: Wallet API + web container deploy; NPM HTTP vhosts.
-- 2026-08-14: Domain correction — live origins are `luv13.ai` / `api.luv13.ai` on the mini-PC. Stripe LIVE keys remain a human gate. Cloudflare grey-cloud DNS is the remaining human step if records are missing or proxied.
-- 2026-08-14: Origin cutover applied on `kor` (NPM host 55 `luv13.ai`→:3100; host 34 already had `api.luv13.ai`+`api.luv13.com`). Public DNS exists but is orange-clouded.
-- 2026-09-08: Web remake (red hero) via tar-over-ssh to `/home/kor/luv13-web`; preserved `.env.production` + `docker-compose.yml`; rebuilt `luv13-web`. API scraps synced excluding live-ahead `billing.py` (`managed_payments`); proxy left alone; sanitized proxy parked at `/home/kor/luv-scraps/proxy`. Public IP confirmed `71.209.202.110`.
+- 2026-08-14: Domain correction — live origins are `luv13.ai` / `api.luv13.ai`. Stripe LIVE keys remain a human gate.
+- 2026-08-14: Origin cutover on `kor` (NPM `luv13.ai`→:3100).
+- 2026-09-08: Web remake via tar-over-ssh; preserved `.env.production` + `docker-compose.yml`; rebuilt `luv13-web`. Public IP `71.209.202.110`.
+- 2026-09-13: Full working tree dumped to `/home/kor/luv`; live web tar’d to `/home/kor/luv13-web`; `luv13-web` rebuilt. API/proxy left running. Tailscale path `ssh kor`.
+- 2026-09-13 (pm): Re-deploy after privacy/terms pages + hero marquee/chart/slides changes. Same flow; `luv13-web` recreated 18:09 local. `/`, `/privacy`, `/terms`, `/api/health`, vhost all 200; fonts + rasters 200; API/proxy Created unchanged.
+
+## Verify the `/BRAND_ASSETS` navigation guard
+`middleware.ts` blocks document navigations via the `Sec-Fetch-Dest: document` request header. Plain `curl` does **not** send it, so a bare `curl .../BRAND_ASSETS/models/x.jpg` returns 200 and looks like the guard is broken. To test it, send the header:
+```
+curl -o /dev/null -w '%{http_code}\n' -H 'Sec-Fetch-Dest: document' http://127.0.0.1:3100/BRAND_ASSETS/models/kimi.jpg   # 404
+curl -o /dev/null -w '%{http_code}\n' -H 'Sec-Fetch-Dest: image'    http://127.0.0.1:3100/BRAND_ASSETS/models/kimi.jpg   # 200
+```

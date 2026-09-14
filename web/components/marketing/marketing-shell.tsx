@@ -4,15 +4,25 @@ import { SiteHeader } from "@/components/marketing/site-header";
 export function MarketingShell({
   children,
   overlayHeader = false,
+  showFooter = true,
 }: {
   children: React.ReactNode;
   overlayHeader?: boolean;
+  showFooter?: boolean;
 }) {
   return (
     <div className="relative flex min-h-dvh flex-col bg-paper text-ink">
-      <SiteHeader overlay={overlayHeader} />
-      <div className="flex-1">{children}</div>
-      <SiteFooter />
+      <SiteHeader />
+      <div
+        className={
+          overlayHeader
+            ? "flex-1"
+            : "flex-1 pt-[var(--site-header-height)]"
+        }
+      >
+        {children}
+      </div>
+      {showFooter ? <SiteFooter /> : null}
     </div>
   );
 }

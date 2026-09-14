@@ -1,7 +1,14 @@
 import { capabilityLabel } from "@/components/models/capability-badge";
 import type { Capability, ModelSort } from "@/lib/model-directory";
 
-const quickFilters: Capability[] = ["reasoning", "vision", "tool-use", "flex"];
+const quickFilters: Capability[] = [
+  "tools",
+  "vision",
+  "reasoning",
+  "json",
+  "flex",
+  "embedding",
+];
 
 type ModelFiltersProps = {
   query: string;

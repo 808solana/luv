@@ -2,7 +2,7 @@
 name: typography
 description: Use when designing, implementing, or reviewing LUV13 marketing/site typography, buttons, section backgrounds, overlay menus, or any visual remake that should follow the Hims-inspired LUV13 type system. Canonical source of truth for fonts, type scale, pills, and surfaces.
 created: 2026-09-06
-updated: 2026-09-06
+updated: 2026-09-13
 tags: [frontend, typography, design-system, hims, luv13, pills, marketing]
 ---
 
@@ -31,29 +31,32 @@ Keep LUV13 type. Layer the Hims *roles* onto those faces.
 | Role | Face | Why |
 | --- | --- | --- |
 | Logo mark | `BRAND_ASSETS/LUV13.png` (served as `/BRAND_ASSETS/LUV13.png`) | Brand source of truth. Do not replace with a fake Didone wordmark. |
-| Sans — UI, body, headlines, buttons | Helvetica Neue / HelveticaNeue-Bold | Existing LUV13 geometric sans. This is the Hims "bold geometric headline" role. |
-| Serif — italic emphasis inside headlines; overlay "Menu" title | Instrument Serif | Already in the stack. This is the Hims "elegant serif" role. On LUV13 the italic stays **black**, not gold. |
-| Mono — slugs, keys, URLs, curl, prices in tables | Tailwind `font-mono` / existing ui-monospace stack | Data, not display. Tabular nums on money and token counts. |
+| Sans — all UI, body, headlines, buttons | HelveticaNeue-Bold (`HelveticaNeue-Bold.ttf`) | **Permanent site face.** |
+| Sans — designated subtext | HelveticaNeueUltraLightItalic (`HelveticaNeueUltraLightItalic.otf`) | Same family, lighter italic. `#models` heading **Infrastructure by Neuralwatt.com**, `#use-now` credit **facts by openrouter.com**, and `#models` chart credit **facts by artificialanalysis.ai** (all `.hero-neuralwatt`). |
+| Mono — keys, URLs, curl, model IDs | Tailwind `font-mono` / existing ui-monospace stack | Data only. Not the brand voice. |
+
+Do **not** use Instrument Serif, General Sans, or system Helvetica Neue as the site face.
 
 ### Stacks (adopt in `web/app/globals.css` `@theme inline`)
 
 These already exist. Keep them. Do not let the Vercel theme's `"General Sans"` win — it is overridden post-bridge today; keep that override.
 
 ```css
---font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
---font-serif: "Instrument Serif", Georgia, "Times New Roman", serif;
---font-helveticaneue-bold: "HelveticaNeue-Bold", "Helvetica Neue", Helvetica, Arial, sans-serif;
+--font-sans: "HelveticaNeue-Bold", Helvetica, Arial, sans-serif;
+--font-serif: "HelveticaNeue-Bold", Helvetica, Arial, sans-serif;
+--font-helveticaneue-bold: "HelveticaNeue-Bold", Helvetica, Arial, sans-serif;
+--font-helveticaneue-ultralight-italic: "HelveticaNeueUltraLightItalic", Helvetica, Arial, sans-serif;
 --font-mono: ui-monospace, "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas, monospace;
 ```
 
-Tailwind: `font-sans`, `font-serif`, `font-helveticaneue-bold`, `font-mono`.
+Tailwind: `font-sans`, `font-serif`, `font-helveticaneue-bold` render Bold. `font-helveticaneue-ultralight-italic` is the lighter italic cut for designated subtext. `font-mono` stays mono.
 
 Existing helper:
 
 ```css
 .font-serif-italic {
-  font-family: var(--font-serif);
-  font-style: italic;
+  font-family: var(--font-sans);
+  font-style: normal;
 }
 ```
 
@@ -61,12 +64,13 @@ Existing helper:
 
 | Face | Load |
 | --- | --- |
-| Helvetica Neue | System `local()` first. |
-| HelveticaNeue-Bold | Served from `web/public/BRAND_ASSETS/HelveticaNeue-Bold.otf` via `@font-face` `url("/BRAND_ASSETS/HelveticaNeue-Bold.otf")` plus `local()`. |
-| Instrument Serif | Google Fonts in `web/app/layout.tsx`: `family=Instrument+Serif:ital,wght@0,400;1,400`. Keep the googleapis / gstatic preconnects. |
-| Specimen | `BRAND_ASSETS/typography.png` — visual check for the LUV13 sans, not a Hims clone. |
+| HelveticaNeue-Bold | **Required.** `web/public/BRAND_ASSETS/HelveticaNeue-Bold.ttf` via `@font-face` `url("/BRAND_ASSETS/HelveticaNeue-Bold.ttf")`. Preload that URL in `web/app/layout.tsx`. Map `font-weight: 100 900` so every CSS weight uses this file. Do not prefer `local()`. |
+| HelveticaNeueUltraLightItalic | **Designated subtext only.** `web/public/BRAND_ASSETS/HelveticaNeueUltraLightItalic.otf`. Own family name so Bold’s `100 900` range cannot swallow it. Preload in `layout.tsx`. |
+| HelveticaNeue-Bold.otf | Legacy file. Do not load it. The TTF is canonical. |
+| Instrument Serif | **Retired.** Do not add Google Fonts preconnects or the Instrument Serif stylesheet. |
+| Specimen | `BRAND_ASSETS/typography.png` — visual check for the LUV13 sans. |
 
-Do not add Sofia, Sofia Pro, Circular, or any Hims webfont. Secondary write-ups name those for *their* site; they were not inspected here, and they are not LUV13.
+Do not add Sofia, Sofia Pro, Circular, Inter, General Sans, or any Hims webfont.
 
 ---
 
@@ -80,7 +84,7 @@ Use `text-wrap: balance` on display/h1–h3. `text-wrap: pretty` on body. `-webk
 | --- | --- | --- | --- | --- | --- | --- |
 | Logo (PNG) | 32–40px tall in nav | — | — | — | as-authored | `h-8` / `h-10` |
 | Display | 48 / 64 / 80px (sm/md/xl) | 700 HelveticaNeue-Bold | 0.92–0.96 | `-0.03em` | ink | `text-5xl md:text-7xl xl:text-[5rem] font-helveticaneue-bold tracking-tight leading-[0.94]` |
-| Display emphasis | same size as surrounding display | 400 italic Instrument Serif | inherit | `-0.01em` | ink (not gold) | `font-serif italic font-normal` |
+| Display emphasis | same size as surrounding display | HelveticaNeue-Bold (no second family) | inherit | `-0.01em` | ink | `font-sans` |
 | h1 | 36 / 48 / 56px | 700 | 1.0 | `-0.025em` | ink | `text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight` |
 | h2 | 28 / 36 / 40px | 700 | 1.1 | `-0.02em` | ink | `text-3xl md:text-4xl font-bold tracking-tight` |
 | h3 | 22 / 24 / 28px | 700 | 1.2 | `-0.015em` | ink | `text-xl md:text-2xl font-bold tracking-tight` |
@@ -96,7 +100,7 @@ Sentence case on buttons and headlines. Never all-caps on CTAs. All-caps only fo
 
 Hero measure: ~18–28ch. Body measure: ~65ch.
 
-Existing mixed-style headlines: `WordsPullUpMultiStyle` in `web/components/words-pull-up.tsx` — put the italic serif class on the emphasis segment.
+Existing mixed-style headlines: `WordsPullUpMultiStyle` stays HelveticaNeue-Bold throughout — no second family.
 
 ---
 
@@ -226,8 +230,8 @@ On a dark section, keep the white fill; the white ring in the shadow (`3px #fff`
 ## Section rhythm
 
 1. `html`/`body` background: white. No site-wide video as the page color. (Current scroll-video + `html { background:#000 }` + transparent body is the **old** surface. Remake replaces it.)
-2. Nav sits on white (or transparent over white). Ink logo, white Log in pill, hamburger.
-3. Hero on `/` is a full-viewport poster (`/BRAND_ASSETS/hero-home.jpg`) on `#fe0000`. Do not recreate the poster in HTML. Other marketing pages stay white/cream. Type on those pages stays black on cream/white.
+2. Fixed transparent header overlays the home hero. Other marketing pages pad by `--site-header-height`.
+3. Hero on `/` is a compact HTML `luv13` mark (HelveticaNeue-Bold, `--paper`) on a solid `#fe0000` field (`.home-hero-frame`). Not a poster image, not a pale wash. Other marketing pages stay white/cream. Type on those pages stays black on cream/white.
 4. Following sections: either remain white with padded cards, **or** a full-bleed band with `rounded-t-[32px]` to `rounded-t-[48px]` that visually “scrolls up” over the previous white. Large radius on the section itself, not only inner cards.
 5. After a tinted/dark band, the next section returns to white. Do not leave the rest of the page stuck on brown.
 6. Inner cards: `rounded-[24px]` to `rounded-[32px]` (`rounded-3xl` is 24px; use `rounded-[32px]` for Hims-soft). Padding `p-8 md:p-12`. Generous gaps (`gap-4` minimum between cards; section `py-20 md:py-28` already matches current page — keep or increase, never tighten).
@@ -243,21 +247,22 @@ Copy is LUV13 AI services. Not weight loss, not Rx, not GLP-1.
 
 ### Nav
 
-- Left: `LUV13.png`, ~32–40px high.
-- Right: pill `Log in` → `/login` + hamburger (three hairlines, 24px).
-- No serif in the nav except if a text fallback for the logo is needed (`luv13` lowercase Instrument Serif, ink). Prefer the PNG.
+- Fixed **transparent** header, ink links (no text-shadow). A single **Dashboard** link (`/keys` → dashboard) on desktop **and** mobile. No logo in the header, no Models link, no hamburger.
+- Skill: `.cursor/skills/frontend/marketing-chrome.md`.
+- Footer: sparse columns + **LEV 13 © 2026**. HelveticaNeue-Bold, not UltraLight.
 
 ### Hero (`/`)
 
-The homepage hero is the red poster image, not HTML type.
+The homepage hero is a compact HTML `luv13` mark on a solid red field.
 
-- Asset: `/BRAND_ASSETS/hero-home.jpg` (source red `#fe0000`).
-- Section: full viewport (`min-h-dvh`), `bg-[#fe0000]`, `next/image` `fill` + `object-contain` so the poster type at the edges is never cropped. Letterboxing is the same red.
-- Homepage nav uses `MarketingShell overlayHeader`: `fixed` transparent header over the poster so the red reaches the top of the viewport. Other marketing pages keep the sticky white header.
-- No “Hosted models”, “Cheapest access…”, GLM/pay-per-token subcopy, or Create account CTA in the hero. Keep an `sr-only` h1 for the poster line.
-- The cream models band (`rounded-t-[48px]`) overlaps the poster (`-mt-12`) so the corners show red, not white.
+- Field: `.home-hero-frame` fills `#fe0000` (`--section-red`). No wash, no overlay, no `hero-home.jpg`.
+- Mark: HelveticaNeue-Bold, `--paper` (white) for contrast. Compact — not `min-h-dvh`. Visible `h1`, not `sr-only`. The mark decrypts once on load (glyph scramble → lock-in, `DecryptText`) and never slides.
+- Below the mark, inside the same red field: a full-bleed text strip — `open-sourced | low price | ai models | hosted by Neuralwatt.com |` repeated, sliding, and decrypting once. It has no band, border, or separator glyphs of its own and inherits `--paper`. Type is `clamp(1.125rem, 2.7vw, 2.025rem)`; the strip runs edge to edge with zero horizontal padding, and its own `py` supplies the gap under `luv13`.
+- Marketing header overlays the red hero (`overlayHeader`) and stays transparent. Keep the compact `luv13` mark and existing `pt-24`.
+- No “Hosted models”, “Cheapest access…”, GLM/pay-per-token subcopy, or Create account CTA in the hero.
+- White page resumes below the red field. Keep a gap (`margin-bottom` on the frame) before **Infrastructure by Neuralwatt.com**. Do not paint Models / Use Now / API red.
 
-On other marketing pages, headlines stay Helvetica Bold with one italic Instrument Serif word, all ink on paper. Subhead: `text-base md:text-lg font-medium text-black/70`. Primary CTA: pill “Create account” → `/signup`.
+On other marketing pages, headlines stay HelveticaNeue-Bold, all ink on paper. Subhead: `text-base md:text-lg font-medium text-black/70`. Primary CTA: pill “Create account” → `/signup`.
 
 ### Service cards (models / API — not products)
 
@@ -276,7 +281,7 @@ Do not put injector-pen photography, “From $149/mo”, or medical seals on the
 
 White panel, `rounded-[32px]`, generous padding, over a dimmed page (not a second website).
 
-- Title: Instrument Serif roman, ~36–44px, ink — `Menu`.
+- Title: HelveticaNeue-Bold, ~36–44px, ink — `Menu`.
 - Section labels: eyebrow style — `EXPLORE`, `MODELS`.
 - Rows: Helvetica 18–20px medium, full-width, no dividing borders, chevron right (`>`). Examples: `Models`, `Pricing`, `API`, `Dashboard`, `Create account`.
 - Footer of menu: small service cards (GLM-5.2, API keys, Top up) on `--section-cream`, `rounded-[24px]`.
@@ -298,9 +303,8 @@ White panel, `rounded-[32px]`, generous padding, over a dimmed page (not a secon
 
 **Do**
 
-- Keep Helvetica Neue + Instrument Serif.
+- Keep HelveticaNeue-Bold as the UI face (`HelveticaNeue-Bold.ttf`). UltraLight Italic is only for designated subtext (`HelveticaNeueUltraLightItalic.otf`) — Infrastructure and the OpenRouter facts credit.
 - Keep white page, black text, white pills.
-- Use italic serif for one emphasis word in a display line.
 - Use `rounded-full` pills with the regrow shadow.
 - Let sections pick up cream or rare near-black, then return to white.
 - Write “we”. Talk about models, tokens, keys, credit, Cursor.
@@ -310,14 +314,14 @@ White panel, `rounded-[32px]`, generous padding, over a dimmed page (not a secon
 **Don't**
 
 - Don't copy Hims medical copy or product names (no Wegovy, GLP-1, hair, Rx).
-- Don't throw away LUV13 fonts for Sofia/Circular/system-ui-as-brand.
+- Don't throw away LUV13's HelveticaNeue-Bold TTF for Sofia/Circular/Instrument Serif/system-ui-as-brand.
 - Don't use gold/tan for italic emphasis or for primary pills.
 - Don't use the shadcn blue `--primary` as a marketing button fill.
 - Don't use sharp corners on buttons (`rounded-lg`, `rounded-md`).
 - Don't set the whole site on chocolate/navy; dark is a section, not the page.
 - Don't keep `html { background:#000 }` + transparent body once the remake lands.
 - Don't invent companion/dating-AI copy. The product is hosted LLM access.
-- Don't mention OpenRouter on the public site.
+- Don't mention OpenRouter on the public site except the `#use-now` credit **facts by openrouter.com** (same `.hero-neuralwatt` treatment as Infrastructure).
 
 ---
 
@@ -344,10 +348,9 @@ Keep existing oklch shadcn bridge for dashboard primitives. Add these marketing 
 }
 
 @theme inline {
-  --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --font-serif: "Instrument Serif", Georgia, "Times New Roman", serif;
-  --font-helveticaneue-bold:
-    "HelveticaNeue-Bold", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-sans: "HelveticaNeue-Bold", Helvetica, Arial, sans-serif;
+  --font-serif: "HelveticaNeue-Bold", Helvetica, Arial, sans-serif;
+  --font-helveticaneue-bold: "HelveticaNeue-Bold", Helvetica, Arial, sans-serif;
   --color-ink: var(--ink);
   --color-paper: var(--paper);
   --radius-card: var(--radius-card);
@@ -367,12 +370,15 @@ body {
 }
 ```
 
-### Google Fonts link (layout.tsx)
+### Font load (layout.tsx)
 
 ```html
 <link
-  href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital,wght@0,400;1,400&display=swap"
-  rel="stylesheet"
+  rel="preload"
+  href="/BRAND_ASSETS/HelveticaNeue-Bold.ttf"
+  as="font"
+  type="font/ttf"
+  crossOrigin="anonymous"
 />
 ```
 
@@ -381,11 +387,8 @@ body {
 ```css
 @font-face {
   font-family: "HelveticaNeue-Bold";
-  src:
-    url("/BRAND_ASSETS/HelveticaNeue-Bold.otf") format("opentype"),
-    local("Helvetica Neue Bold"),
-    local("HelveticaNeue-Bold");
-  font-weight: 700;
+  src: url("/BRAND_ASSETS/HelveticaNeue-Bold.ttf") format("truetype");
+  font-weight: 100 900;
   font-style: normal;
   font-display: swap;
 }
@@ -399,8 +402,7 @@ body {
     API access
   </p>
   <h1 className="mt-4 max-w-[20ch] text-5xl font-helveticaneue-bold leading-[0.94] tracking-tight text-black md:text-7xl">
-    Pay per token.{" "}
-    <span className="font-serif italic font-normal">Nothing else.</span>
+    Pay per token. Nothing else.
   </h1>
   <p className="mt-6 max-w-md text-base font-medium leading-relaxed text-black/70">
     Sign up, create a key at $0, and add credit when you are ready to run GLM-5.2.
@@ -432,14 +434,9 @@ body {
 
 ---
 
-## Splash (implemented)
+## Splash
 
-Hard refresh / full document load only. Not on client-side App Router navigations.
-
-1. SSR `#luv13-splash` in `web/app/layout.tsx` — black full-viewport overlay, small `LUV13.png` (the PNG already reads on black via light outlines; do not invent a wordmark).
-2. Inline critical CSS sets `html{background:#000}` so first paint is black before the CSS bundle.
-3. `SplashScreen` waits for `document.fonts.ready` + `window` `load`, plus a **220ms** floor so a 0ms flash does not blink. Then adds `.is-exiting` (`transform: translateY(-100%)`, 700ms). Reduced motion: remove immediately.
-4. After exit: `html.splash-done` → `--paper`. Overlay is removed from the DOM.
+**Removed.** No reload overlay, black curtain, or logo pulse. Hard refresh paints the page directly (`html` / `body` paper). Do not reintroduce `#luv13-splash` or `SplashScreen` unless the user asks.
 
 ## Current vs remake (do not confuse)
 
@@ -447,16 +444,17 @@ Hard refresh / full document load only. Not on client-side App Router navigation
 | --- | --- |
 | `html` black, body transparent, full-page HLS video | White page; cream / rare ink section bands |
 | Liquid-glass pills `bg-white/25` | Solid white `.pill-cta`, black hairline, regrow |
-| Instrument Serif italic-only | Roman + italic |
-| HelveticaNeue-Bold `local()` only | Also `url("/BRAND_ASSETS/HelveticaNeue-Bold.otf")` |
+| Instrument Serif | Retired — do not load |
+| HelveticaNeue-Bold `local()` / `.otf` | Canonical TTF `url("/BRAND_ASSETS/HelveticaNeue-Bold.ttf")` |
 | shadcn `--primary` blue in tokens | Unused for marketing CTAs |
 | `FlowButton` arrow slide | Marketing uses `PillCta` |
 
 ## Verification
 
-- [ ] Headlines are Helvetica Neue Bold; emphasis words are Instrument Serif italic in ink.
+- [ ] All UI type is HelveticaNeue-Bold from `/BRAND_ASSETS/HelveticaNeue-Bold.ttf` except designated subtext (`HelveticaNeueUltraLightItalic`).
+- [ ] No Instrument Serif / Google Fonts stylesheet on the page.
 - [ ] Logo is `LUV13.png`, not a recreated serif wordmark.
-- [ ] Page background is white except section-owned bands (homepage hero is the red poster, not a white type block).
+- [ ] Page background is white except section-owned bands (homepage hero is a solid `#fe0000` field with a white `luv13` mark).
 - [ ] All marketing CTAs are `rounded-full`, white, black type, 1px black border, regrow hover, `active:scale-[0.96]`.
 - [ ] Copy names models, keys, credit, Cursor — not Hims medical products.
 - [ ] `prefers-reduced-motion` disables pill scale/shadow.
@@ -467,3 +465,12 @@ Hard refresh / full document load only. Not on client-side App Router navigation
 - 2026-09-06: Created as the canonical LUV13 × Hims typography spec.
 - 2026-09-06: Implemented remake + splash; deployed `luv13-web` on kor :3100. Logo PNG already reads on black. Local `rsync` missing — tar over SSH.
 - 2026-09-06: Homepage hero became the red poster image (`hero-home.jpg` on `#fe0000`); HTML hero copy removed.
+- 2026-09-09: Canonical face is self-hosted `HelveticaNeue-Bold.ttf` for the entire site. Instrument Serif retired.
+- 2026-09-11: Added HelveticaNeueUltraLightItalic for designated subtext (hero Neuralwatt line).
+- 2026-09-11: Neuralwatt line moved to `#models` heading; hero is the `luv13` mark only (no `.ai`).
+- 2026-09-13: `#models` heading copy is **Infrastructure by Neuralwatt.com**.
+- 2026-09-13: Home hero field is solid `#fe0000` with a white `luv13` mark (pale wash removed).
+- 2026-09-13: `#use-now` credit **facts by openrouter.com** reuses `.hero-neuralwatt` (same UltraLight Italic, size, 30px, center as Infrastructure).
+- 2026-09-13: `#models` chart credit **facts by artificialanalysis.ai** reuses `.hero-neuralwatt`.
+- 2026-09-13: Marketing chrome — pale header, Models/Keys, LEV 13 footer. See `marketing-chrome.md`.
+- 2026-09-13: Hero gained a full-bleed decrypting text strip under the `luv13` mark (see `text-marquee.md` / `decrypt-text.md`); the luv13 mark decrypts on load. Hero subtext rules still apply — this strip is whitespace-separated copy, not the `.hero-neuralwatt` subtext face.

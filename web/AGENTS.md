@@ -24,7 +24,7 @@ web/
 │   ├── keys/page.tsx                # Compatibility redirect
 │   ├── top-up/page.tsx              # Dashboard modal redirect
 │   ├── globals.css                  # Tailwind v4 + brand tokens
-│   ├── layout.tsx                   # root layout, fonts, splash overlay
+│   ├── layout.tsx                   # root layout, fonts
 │   └── page.tsx                     # marketing home page
 ├── components/
 │   ├── marketing/                   # header, overlay menu, pills, footer
@@ -81,7 +81,7 @@ Copy `.env.example` to `.env.local` and fill in for local development. Productio
 
 - Logo: `public/BRAND_ASSETS/LUV13.png`.
 - Canonical type/surface spec: `../.cursor/skills/frontend/typography.md`.
-- Typography: Helvetica Neue / HelveticaNeue-Bold for UI and headlines; Instrument Serif for italic emphasis and overlay “Menu”.
+- Typography: HelveticaNeue-Bold (`/BRAND_ASSETS/HelveticaNeue-Bold.ttf`) for all UI. Do not load Instrument Serif. `font-mono` only for keys, URLs, and model IDs.
 - Colors: page white `#ffffff`, text `#0d0c12`, marketing CTAs white pills with black type (`.pill-cta`). Do not use shadcn `--primary` blue for marketing buttons.
 - Voice: "we". No founder biography. Simple, direct, no hype.
 

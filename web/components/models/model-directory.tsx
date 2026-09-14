@@ -80,7 +80,7 @@ export function ModelDirectory({ models }: { models: DirectoryModel[] }) {
 
       <div className="mt-5">
         {results.length > 0 ? (
-          <div className="flex flex-col gap-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             {results.map((model) => (
               <ModelCard key={model.id} model={model} />
             ))}

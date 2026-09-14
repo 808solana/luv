@@ -17,9 +17,11 @@
   --section-mist: #e7e4de;
   --section-ink: #0d0c12;
   --section-navy: #12141c;
+  --section-red: #fe0000;
   --radius-card: 32px;
   --radius-section: 48px;
   --radius-pill: 9999px;
+  --site-header-height: 3.5rem;
   --background: 1 0 0;
   --foreground: 0.141 0.004 285.824;
   --card: 1 0 0;
@@ -52,9 +54,7 @@
   --sidebar-accent: 0.968 0.001 286.375;
   --sidebar-accent-foreground: 0.21 0.006 285.883;
   --sidebar-border: 0.928 0.006 264.531;
-  --font-sans:
-    "General Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
+  --font-sans: "HelveticaNeue-Bold", Helvetica, Arial, sans-serif;
   --font-mono:
     ui-monospace, "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas,
     monospace;
@@ -137,6 +137,7 @@
   --color-section-mist: var(--section-mist);
   --color-section-ink: var(--section-ink);
   --color-section-navy: var(--section-navy);
+  --color-section-red: var(--section-red);
   --radius: var(--radius);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -145,37 +146,94 @@
   --radius-card: var(--radius-card);
   --radius-section: var(--radius-section);
   --radius-pill: 9999px;
-  /* Brand fonts stay (LUV13 choice). */
-  --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --font-serif: "Instrument Serif", Georgia, "Times New Roman", serif;
-  --font-helveticaneue-bold:
-    "HelveticaNeue-Bold", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  /* Canonical site face: self-hosted HelveticaNeue-Bold.ttf. */
+  --font-sans: "HelveticaNeue-Bold", Helvetica, Arial, sans-serif;
+  --font-serif: "HelveticaNeue-Bold", Helvetica, Arial, sans-serif;
+  --font-helveticaneue-bold: "HelveticaNeue-Bold", Helvetica, Arial, sans-serif;
+  --font-helveticaneue-ultralight-italic: "HelveticaNeueUltraLightItalic",
+    Helvetica, Arial, sans-serif;
 }
 
 @font-face {
   font-family: "HelveticaNeue-Bold";
-  src:
-    url("/BRAND_ASSETS/HelveticaNeue-Bold.otf") format("opentype"),
-    local("Helvetica Neue Bold"),
-    local("HelveticaNeue-Bold"),
-    local("Helvetica Neue 700");
-  font-weight: 700;
+  src: url("/BRAND_ASSETS/HelveticaNeue-Bold.ttf") format("truetype");
+  font-weight: 100 900;
   font-style: normal;
   font-display: swap;
 }
 
+@font-face {
+  font-family: "HelveticaNeue-Bold";
+  src: url("/BRAND_ASSETS/HelveticaNeue-Bold.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "HelveticaNeueUltraLightItalic";
+  src: url("/BRAND_ASSETS/HelveticaNeueUltraLightItalic.otf") format("opentype");
+  font-weight: 100;
+  font-style: italic;
+  font-display: swap;
+}
+
+.font-helveticaneue-ultralight-italic {
+  font-family: var(--font-helveticaneue-ultralight-italic);
+  font-weight: 100;
+  font-style: italic;
+}
+
+.home-hero-frame {
+  background: var(--section-red);
+  /* Red field down to the white gap above Neuralwatt */
+  margin-bottom: 2.75rem;
+  padding-bottom: 390px;
+}
+
+@media (min-width: 768px) {
+  .home-hero-frame {
+    margin-bottom: 3.5rem;
+    padding-bottom: 398px;
+  }
+}
+
+/* Designated subtext: Infrastructure by Neuralwatt.com, facts by openrouter.com, facts by artificialanalysis.ai */
+.hero-neuralwatt {
+  font-family: var(--font-helveticaneue-ultralight-italic);
+  font-weight: 100;
+  font-style: italic;
+  color: #000;
+  font-size: calc(0.875rem * 1.1);
+  letter-spacing: 1px;
+  /* letter-spacing also pads the space glyph; keep word gaps as they were */
+  word-spacing: -2px;
+}
+
+@media (min-width: 768px) {
+  .hero-neuralwatt {
+    font-size: calc(1rem * 1.1);
+  }
+}
+
+.site-header {
+  min-height: var(--site-header-height);
+}
+
 html {
   scroll-behavior: smooth;
-  background: #000000;
-  color: var(--ink);
-  -webkit-font-smoothing: antialiased;
-}
-
-html.splash-done {
   background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+  /* Touch: keep the OS momentum scroller on its compositor fast path. Lenis is
+     booted for fine/hover pointers only (see components/smooth-scroll.tsx), so
+     phones never route scroll through the main thread. */
+  -webkit-overflow-scrolling: touch;
 }
 
-/* Lenis smooth-scroll setup */
+/* Lenis smooth-scroll setup — desktop wheel only. */
 html.lenis,
 html.lenis body {
   height: auto;
@@ -196,12 +254,12 @@ html.lenis body {
 body {
   background: var(--paper);
   color: var(--ink);
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--font-sans);
 }
 
 .font-serif-italic {
-  font-family: var(--font-serif);
-  font-style: italic;
+  font-family: var(--font-sans);
+  font-style: normal;
 }
 
 .pill-cta {
@@ -255,37 +313,15 @@ body {
 
 .pill-cta-ghost {
   background: transparent;
-  color: #ffffff;
-  border-color: #ffffff;
+  color: var(--pill-ink);
+  border-color: var(--pill-ink);
 }
 
 .pill-cta-ghost:hover,
 .pill-cta-ghost:focus-visible {
   box-shadow:
-    0 0 0 3px var(--section-ink),
-    0 0 0 4px #ffffff;
-}
-
-#luv13-splash {
-  position: fixed;
-  inset: 0;
-  z-index: 99999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #000000;
-  transform: translateY(0);
-  transition: transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-#luv13-splash.is-exiting {
-  transform: translateY(-100%);
-  pointer-events: none;
-}
-
-#luv13-splash img {
-  height: 48px;
-  width: auto;
+    0 0 0 3px var(--paper),
+    0 0 0 4px var(--ink);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -293,10 +329,6 @@ body {
   .pill-cta:active {
     transform: none;
     box-shadow: none;
-  }
-
-  #luv13-splash {
-    transition: none;
   }
 }
 
@@ -386,6 +418,46 @@ body {
   to {
     background-position: 0% -1000%;
   }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* DecryptText — monochrome, inherits currentColor so it reads white-on-red in
+   the hero and ink-on-paper anywhere else. */
+.decrypt-char[data-state="scramble"] {
+  opacity: 0.4;
+}
+
+.decrypt-char[data-state="lock"] {
+  animation: decrypt-lock 380ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+@keyframes decrypt-lock {
+  0% {
+    opacity: 1;
+    text-shadow: 0 0 0.45em currentColor;
+  }
+  100% {
+    opacity: 1;
+    text-shadow: 0 0 0 transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .decrypt-char[data-state="lock"] {
+    animation: none;
+  }
+}
+
+.animate-in.fade-in {
+  animation: fade-in 300ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @media (prefers-reduced-motion: reduce) {

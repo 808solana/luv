@@ -1,0 +1,16 @@
+---
+description: LUV13 site typeface is self-hosted Helvetica Neue. Bold for UI; UltraLight Italic for designated subtext only.
+alwaysApply: true
+---
+
+# Site font (permanent)
+
+The brand family is **Helvetica Neue**, self-hosted from `web/public/BRAND_ASSETS/`.
+
+- **UI / headlines / body:** `HelveticaNeue-Bold.ttf` as `HelveticaNeue-Bold`. `--font-sans`, `--font-serif`, and `--font-helveticaneue-bold` all point at this face.
+- Designated subtext only: `HelveticaNeueUltraLightItalic.otf` as `HelveticaNeueUltraLightItalic` (`--font-helveticaneue-ultralight-italic`). Same family, lighter italic cut. Use: `#models` heading “Infrastructure by Neuralwatt.com”, `#use-now` credit “facts by openrouter.com”, and `#models` chart credit “facts by artificialanalysis.ai” (same `.hero-neuralwatt` treatment).
+- `html` / `body` use `font-family: var(--font-sans)` (Bold). Do not make UltraLight the body face.
+- Do not load Instrument Serif, General Sans, Sofia, Circular, Inter, or system Helvetica as the brand face.
+- Do not use `local("Helvetica Neue")` as the primary source — the files in `BRAND_ASSETS/` are the source of truth.
+- `font-mono` is allowed only for machine strings (API keys, URLs, model IDs).
+- Spec: `.cursor/skills/frontend/typography.md`.

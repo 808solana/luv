@@ -1,121 +1,190 @@
 "use client";
 
-import { useState } from "react";
-import { ChevronDown } from "lucide-react";
+import Link from "next/link";
+import { Coins, Layers, type LucideIcon } from "lucide-react";
 import { CapabilityBadge } from "@/components/models/capability-badge";
-import { ContextLength } from "@/components/models/context-length";
-import { PricingDisplay } from "@/components/models/pricing-display";
-import { CopyField } from "@/components/ui/copy-field";
-import type { DirectoryModel } from "@/lib/model-directory";
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  CURSOR_USD_PER_MILLION_TOKENS,
+  formatContextLength,
+  formatCursorExchange,
+  formatPerMillionRate,
+  formatUsd,
+  type DirectoryModel,
+} from "@/lib/model-directory";
+import { cn } from "@/lib/utils";
 
-function ModelMark({ model }: { model: DirectoryModel }) {
-  const initials = model.name
-    .split(/\s|-/)
-    .filter(Boolean)
-    .map((part) => part[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
-
+/**
+ * Mini metric tile in the card-05 spirit: muted label, big tabular value,
+ * corner icon well — used for Context / Input price on the model face.
+ */
+function MetricTile({
+  label,
+  value,
+  subvalue,
+  icon: Icon,
+}: {
+  label: string;
+  value: string;
+  subvalue?: string;
+  icon: LucideIcon;
+}) {
   return (
-    <div
-      aria-hidden="true"
-      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-black/10 bg-black/[0.035] text-sm font-bold tracking-tight text-black/75"
-    >
-      {initials}
+    <div className="relative min-w-0 flex-1 rounded-xl border border-black/[0.08] bg-black/[0.03] p-3 sm:p-3.5">
+      <div className="absolute top-3 right-3">
+        <div className="flex size-7 items-center justify-center rounded-md bg-black/[0.04]">
+          <Icon className="size-3.5 text-black/40" aria-hidden="true" />
+        </div>
+      </div>
+      <p className="pr-8 text-[11px] font-medium leading-tight text-black/45">
+        {label}
+      </p>
+      <p className="mt-1.5 text-base font-semibold tabular-nums tracking-tight text-black sm:text-lg">
+        {value}
+      </p>
+      {subvalue ? (
+        <p className="mt-0.5 text-xs font-medium tabular-nums text-black/50">
+          {subvalue}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+function RateRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-baseline justify-between gap-3 text-sm">
+      <dt className="text-black/45">{label}</dt>
+      <dd className="font-semibold tabular-nums text-black">{value}</dd>
     </div>
   );
 }
 
 export function ModelCard({ model }: { model: DirectoryModel }) {
-  const [expanded, setExpanded] = useState(false);
+  const context = formatContextLength(model.contextTokens);
+  const inputAmount = model.rates?.inputPerMillion;
+  const inputRate =
+    inputAmount != null ? formatPerMillionRate(inputAmount) : null;
+  const cachedRate =
+    model.rates?.cachedInputPerMillion != null
+      ? formatPerMillionRate(model.rates.cachedInputPerMillion)
+      : null;
+  const outputRate =
+    model.rates != null
+      ? formatPerMillionRate(model.rates.outputPerMillion)
+      : null;
+
+  const isPreview = model.badges?.includes("Preview") ?? false;
+  const requestAccess = model.cta === "request_access";
+  const ctaLabel = !model.available
+    ? "Coming soon"
+    : requestAccess
+      ? "Request access"
+      : "Try Now";
+  const ctaHref = model.available ? "/signup" : undefined;
 
   return (
-    <article className="rounded-xl border border-black/10 bg-white px-4 py-5 sm:px-5">
-      <div className="flex items-start gap-3 sm:gap-4">
-        <ModelMark model={model} />
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
-            <div className="min-w-0">
-              <h2 className="text-base font-bold tracking-tight text-black sm:text-lg">
-                {model.name}
-              </h2>
-              <p
-                className="mt-0.5 truncate font-mono text-xs text-black/50"
-                title={model.identifier}
-              >
-                {model.identifier}
-              </p>
-            </div>
-            {model.status && (
-              <span className="rounded-full border border-black/10 bg-black/[0.035] px-2.5 py-1 text-xs font-semibold text-black/65">
-                {model.status}
-              </span>
-            )}
-          </div>
+    <Card
+      id={model.id}
+      className="relative w-full scroll-mt-24 overflow-hidden border-black/10 bg-white shadow-none"
+    >
+      {isPreview ? (
+        <div className="absolute top-5 right-5 z-10">
+          <Badge className="border-transparent bg-amber-700 text-[11px] font-semibold text-white hover:bg-amber-700">
+            Preview
+          </Badge>
+        </div>
+      ) : null}
 
-          <p className="mt-2 text-sm text-black/55">
-            by{" "}
-            <span className="font-medium text-black/70">{model.provider}</span>
-          </p>
-          <p className="mt-3 line-clamp-2 text-sm leading-6 text-black/70">
-            {model.description}
-          </p>
+      <CardHeader className={cn(isPreview && "pr-24")}>
+        <CardTitle className="text-xl font-semibold tracking-tight text-black sm:text-2xl">
+          {model.name}
+        </CardTitle>
+        <CardDescription className="text-black/50">
+          {model.provider}
+        </CardDescription>
+      </CardHeader>
 
-          <div
-            className="mt-4 flex flex-wrap gap-1.5"
-            aria-label="Capabilities"
-          >
+      <CardContent className="space-y-5">
+        {/* card-05 style metric pair — facts from provider cards */}
+        <div className="flex gap-2.5 sm:gap-3">
+          <MetricTile label="Context" value={context} icon={Layers} />
+          <MetricTile
+            label="Input Price"
+            value={inputAmount != null ? formatUsd(inputAmount) : "—"}
+            subvalue={inputAmount != null ? "/M tokens" : undefined}
+            icon={Coins}
+          />
+        </div>
+
+        {/* Cursor exchange: $1.15 ↔ 1M tokens */}
+        <p className="text-xs leading-5 text-black/40">
+          Cursor rate ·{" "}
+          <span className="font-medium tabular-nums text-black/55">
+            {formatCursorExchange(CURSOR_USD_PER_MILLION_TOKENS)}
+          </span>
+        </p>
+
+        {model.capabilities.length > 0 ? (
+          <div className="flex flex-wrap gap-1.5" aria-label="Capabilities">
             {model.capabilities.map((capability) => (
               <CapabilityBadge key={capability} capability={capability} />
             ))}
           </div>
-        </div>
-      </div>
+        ) : null}
 
-      <div className="mt-5 grid grid-cols-1 gap-4 border-t border-black/8 pt-4 sm:grid-cols-2 sm:gap-6">
-        <PricingDisplay model={model} />
-        <ContextLength contextTokens={model.contextTokens} />
-      </div>
-      <button
-        type="button"
-        disabled={!model.available}
-        aria-expanded={model.available ? expanded : undefined}
-        onClick={() => setExpanded((value) => !value)}
-        className="mt-5 flex min-h-11 w-full items-center justify-between rounded-lg bg-black/[0.035] px-4 text-sm font-bold text-black transition-[transform,background-color] duration-150 hover:bg-black/[0.07] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-45 disabled:active:scale-100"
-      >
-        <span>{model.available ? "Model details" : "Coming soon"}</span>
-        {model.available && (
-          <ChevronDown
-            size={17}
-            className={`transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
-            aria-hidden="true"
-          />
-        )}
-      </button>
-      {model.available && expanded && (
-        <div className="mt-4 rounded-xl bg-black/[0.025] p-4 ring-1 ring-black/[0.06] sm:p-5">
-          <dl className="grid gap-4 text-sm sm:grid-cols-3">
-            <div>
-              <dt className="text-black/45">Price</dt>
-              <dd className="mt-1 font-bold tabular-nums">
-                $0.33 / 1M total tokens
-              </dd>
-            </div>
-            <div>
-              <dt className="text-black/45">Tools</dt>
-              <dd className="mt-1 font-bold">Supported</dd>
-            </div>
-            <div>
-              <dt className="text-black/45">Vision</dt>
-              <dd className="mt-1 font-bold">Not supported</dd>
-            </div>
+        {model.effort ? (
+          <p className="text-sm text-black/45">
+            Effort: <span className="text-black/65">{model.effort}</span>
+          </p>
+        ) : null}
+
+        {model.rates ? (
+          <dl className="space-y-2 border-t border-black/[0.06] pt-4">
+            <RateRow label="Input:" value={inputRate ?? "—"} />
+            {cachedRate != null ? (
+              <RateRow label="Cached input:" value={cachedRate} />
+            ) : null}
+            <RateRow label="Output:" value={outputRate ?? "—"} />
           </dl>
-          <div className="mt-5">
-            <CopyField label="Model slug" value={model.identifier} />
-          </div>
-        </div>
-      )}
-    </article>
+        ) : null}
+      </CardContent>
+
+      <CardFooter className="flex flex-col gap-2 sm:flex-row">
+        {ctaHref ? (
+          <Link
+            href={ctaHref}
+            className={cn(
+              "inline-flex min-h-11 flex-1 items-center justify-center rounded-full bg-[#e07a5f] px-5 text-sm font-bold text-white transition-[transform,background-color] duration-150",
+              "hover:bg-[#d4694f] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/30",
+            )}
+          >
+            {ctaLabel}
+          </Link>
+        ) : (
+          <button
+            type="button"
+            disabled
+            className="inline-flex min-h-11 flex-1 cursor-not-allowed items-center justify-center rounded-full bg-[#e07a5f]/45 px-5 text-sm font-bold text-white"
+          >
+            {ctaLabel}
+          </button>
+        )}
+        <Link
+          href={`/models#${model.id}`}
+          className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-full border border-black/15 bg-transparent px-5 text-sm font-semibold text-black/70 transition-colors hover:border-black/30 hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/30 sm:min-w-[6.5rem]"
+        >
+          Details
+        </Link>
+      </CardFooter>
+    </Card>
   );
 }
