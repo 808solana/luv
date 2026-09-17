@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 
-const CONTENT_HASHES = new Set(["#models", "#use-now", "#api", "#pricing"]);
+const CONTENT_HASHES = new Set(["#models", "#use-now", "#pricing"]);
 
 function isContentHash(hash: string) {
   return CONTENT_HASHES.has(hash);

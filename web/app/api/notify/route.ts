@@ -6,12 +6,22 @@ const isValidEmail = (email: string): boolean => {
 
 export async function POST(request: Request) {
   let email: string;
+  let name = "";
+  let message = "";
 
   try {
     const body = await request.json();
     email = String(body.email ?? "")
       .trim()
       .toLowerCase();
+    // Optional — sent by the home-page contact form; the older email-capture
+    // form sends `email` only and is unaffected.
+    name = String(body.name ?? "")
+      .trim()
+      .slice(0, 200);
+    message = String(body.message ?? "")
+      .trim()
+      .slice(0, 5000);
   } catch {
     return Response.json({ error: "Invalid request body." }, { status: 400 });
   }
@@ -27,6 +37,8 @@ export async function POST(request: Request) {
   const to = process.env.NOTIFY_EMAIL;
   const from = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
 
+  const isContact = Boolean(message || name);
+
   console.log(`[notify] email captured: ${email}`);
 
   if (apiKey && to) {
@@ -34,8 +46,15 @@ export async function POST(request: Request) {
     const { error } = await resend.emails.send({
       from,
       to,
-      subject: "LUV13 API interest",
-      text: `New sign-up: ${email}`,
+      subject: isContact ? "LUV13 contact form" : "LUV13 API interest",
+      text: isContact
+        ? [
+            ...(name ? [`Name: ${name}`] : []),
+            `Email: ${email}`,
+            "",
+            message,
+          ].join("\n")
+        : `New sign-up: ${email}`,
     });
 
     if (error) {

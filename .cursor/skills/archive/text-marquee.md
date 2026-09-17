@@ -1,12 +1,17 @@
 ---
 name: text-marquee
-description: Use when adding or changing the full-bleed scrolling text strip in the homepage hero, under the luv13 mark. InfiniteSlider + DecryptText entrance; inherits the surface color.
+description: Archived 2026-09-14. The homepage hero text strip was removed at the user's request; the hero is now just the red field plus the luv13 mark. Kept for the motion notes (width-stable entrance inside InfiniteSlider) if a text marquee ever returns.
 created: 2026-09-13
-updated: 2026-09-13
-tags: [frontend, marketing, motion, marquee, hero, homepage]
+updated: 2026-09-14
+status: stale
+tags: [frontend, marketing, motion, marquee, archive]
 ---
 
-# Hero text marquee
+# Hero text marquee (removed)
+
+**Removed 2026-09-14.** The user did not like the sliding effect, so the whole strip is gone — `web/components/marketing/text-marquee.tsx` was deleted and `web/app/page.tsx` no longer renders it. The hero is now only the `luv13` mark on the solid red field. Do not re-add a sliding strip without an explicit request.
+
+Below is the retired implementation, kept because the measurements and the width-stability pitfall still apply to any `InfiniteSlider` consumer.
 
 Full-bleed strip **inside the hero red field**, directly under the `luv13` mark:
 

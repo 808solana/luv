@@ -15,9 +15,7 @@ export function MarketingShell({
       <SiteHeader />
       <div
         className={
-          overlayHeader
-            ? "flex-1"
-            : "flex-1 pt-[var(--site-header-height)]"
+          overlayHeader ? "flex-1" : "flex-1 pt-[var(--site-header-height)]"
         }
       >
         {children}

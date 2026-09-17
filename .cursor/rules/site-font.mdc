@@ -8,8 +8,9 @@ alwaysApply: true
 The brand family is **Helvetica Neue**, self-hosted from `web/public/BRAND_ASSETS/`.
 
 - **UI / headlines / body:** `HelveticaNeue-Bold.ttf` as `HelveticaNeue-Bold`. `--font-sans`, `--font-serif`, and `--font-helveticaneue-bold` all point at this face.
-- Designated subtext only: `HelveticaNeueUltraLightItalic.otf` as `HelveticaNeueUltraLightItalic` (`--font-helveticaneue-ultralight-italic`). Same family, lighter italic cut. Use: `#models` heading “Infrastructure by Neuralwatt.com”, `#use-now` credit “facts by openrouter.com”, and `#models` chart credit “facts by artificialanalysis.ai” (same `.hero-neuralwatt` treatment).
+- Designated subtext only: `HelveticaNeueUltraLightItalic.otf` as `HelveticaNeueUltraLightItalic` (`--font-helveticaneue-ultralight-italic`). Same family, lighter italic cut. Use: **only** the `#models` heading “Hosted By Neuralwatt.com” (`.hero-neuralwatt`). The `#models` list footer, the `#models` chart credit, and the `#use-now` credit “facts by openrouter.com” were all removed 2026-09-14 — nothing else uses this cut.
 - `html` / `body` use `font-family: var(--font-sans)` (Bold). Do not make UltraLight the body face.
+- **There is no upright non-bold weight of the brand face, and no CSS can produce one.** The only files are the Bold TTF, the legacy Bold OTF, and the UltraLight **Italic** OTF; the Bold face is declared `font-weight: 100 900`, so every weight renders Bold glyphs, and `font-synthesis: none` blocks faked weights. A "make this regular / not bold" request therefore needs a **new upright Regular or Light file** in `BRAND_ASSETS/` plus its own `@font-face` and `--font-*` token — do not attempt it with `font-weight` and do not substitute the italic. (2026-09-15: the hero pill labels were temporarily set in UltraLight Italic for this reason; the user rejected the slant and asked for Bold back.)
 - Do not load Instrument Serif, General Sans, Sofia, Circular, Inter, or system Helvetica as the brand face.
 - Do not use `local("Helvetica Neue")` as the primary source — the files in `BRAND_ASSETS/` are the source of truth.
 - `font-mono` is allowed only for machine strings (API keys, URLs, model IDs).

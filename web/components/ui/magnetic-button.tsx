@@ -29,6 +29,7 @@ function MagneticButton({
     right: 0,
     bottom: 0,
   });
+  const captured = useRef(false);
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -58,6 +59,7 @@ function MagneticButton({
       right: rect.right - tx,
       bottom: rect.bottom - ty,
     };
+    captured.current = true;
   };
 
   const apply = (clientX: number, clientY: number) => {
@@ -65,6 +67,13 @@ function MagneticButton({
       x.set(0);
       y.set(0);
       return;
+    }
+
+    // `onMouseEnter` seeds the rest box, but never assume it ran: a move
+    // without it would read the zeroed initial `rest` and translate by
+    // `clientX * distance`, flinging the element across the page.
+    if (!captured.current) {
+      captureRest();
     }
 
     const nextX = (clientX - rest.current.centerX) * distance;
@@ -111,6 +120,7 @@ function MagneticButton({
         apply(event.clientX, event.clientY);
       }}
       onMouseLeave={() => {
+        captured.current = false;
         x.set(0);
         y.set(0);
       }}

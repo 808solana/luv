@@ -10,12 +10,12 @@ export function ModelSlideshow() {
     >
       <div id="pricing" className="absolute -top-24 left-0 h-px w-px" />
       <h2 id="models-heading" className="hero-neuralwatt mb-[30px] text-center">
-        Infrastructure by Neuralwatt.com
+        Hosted By Neuralwatt.com
       </h2>
-      <div className="mx-auto flex max-w-[88rem] flex-col gap-12 xl:max-w-[112rem] xl:flex-row xl:items-start xl:justify-between xl:gap-10">
-        <div className="xl:shrink-0">
-          <ModelPane />
-        </div>
+      {/* Single column at every width: the model list on top, then the
+          Artificial Analysis comparison chart directly under it. */}
+      <div className="mx-auto flex max-w-[88rem] flex-col gap-12 xl:max-w-[112rem] md:gap-16">
+        <ModelPane />
         <IntelligenceChart />
       </div>
     </section>

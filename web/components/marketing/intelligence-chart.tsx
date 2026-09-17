@@ -1,38 +1,22 @@
-const INTELLIGENCE_INDEX_HREF = "https://artificialanalysis.ai/#intelligence";
-
-/** Natural size of public/BRAND_ASSETS/intelligence-index.png (2.5x upscale). */
-const CARD_WIDTH = 2560;
-const CARD_HEIGHT = 938;
+import { IntelligenceCarousel } from "@/components/marketing/intelligence-carousel";
 
 /**
- * Static Artificial Analysis Intelligence Index card. Borderless on a white
- * background so it blends straight into the page — no frame, no card, no
- * shadow — and sits right of the hosted model list (stacked below it under xl).
- * The image is the source of truth for the bars, labels and scores.
+ * Artificial Analysis Intelligence Index charts, under the hosted model list.
+ *
+ * A slow carousel of the exported charts: drag, arrow keys, or the thumbnail
+ * rail step through them, and it advances on its own while it is on screen and
+ * the visitor is not interacting with it.
+ *
+ * Every slide is painted with `ShieldedImage` (CSS background, not `<img>`) so
+ * the browser attaches no image context-menu items — no “Open image in new
+ * tab”, “Save image as”, “Copy image”, “Copy image address”, “Copy text from
+ * image”, “Create QR code”, or image search. `web/middleware.ts` 404s the
+ * assets on document navigations so the URLs are dead in the address bar.
  */
 export function IntelligenceChart() {
   return (
-    <figure className="w-full min-w-0 xl:flex-1">
-      {/* eslint-disable-next-line @next/next/no-img-element -- static brand raster, keep intrinsic 1024x375 box */}
-      <img
-        src="/BRAND_ASSETS/intelligence-index.png"
-        alt="Artificial Analysis Intelligence Index, September 2026. Ten models ranked by index score: Claude Fable 5.1 and GPT-6 Astra lead at 53, followed by Claude Opus 5 (50), Muse Spark 1.3 (47), GLM-5.3 (45), Kimi K3 (44), Gemini 3.8 Flash (42) and DeepSeek V4.1 Flash (40); Qwen3.8 27B (34) and DeepSeek V4 Pro (31) close the list."
-        width={CARD_WIDTH}
-        height={CARD_HEIGHT}
-        loading="lazy"
-        decoding="async"
-        className="h-auto w-full max-w-full select-none [-webkit-touch-callout:none] xl:max-w-[80rem]"
-      />
-
-      <figcaption className="hero-neuralwatt mt-5 text-left md:mt-6">
-        <a
-          href={INTELLIGENCE_INDEX_HREF}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          facts by artificialanalysis.ai
-        </a>
-      </figcaption>
-    </figure>
+    <div className="mx-auto w-full min-w-0 max-w-[80rem]">
+      <IntelligenceCarousel />
+    </div>
   );
 }

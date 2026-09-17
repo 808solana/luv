@@ -24,6 +24,7 @@ tags: [deploy, docker, kor, tailscale, nginx-proxy-manager, sqlite, stripe]
 1. `ssh -o BatchMode=yes -o ConnectTimeout=15 kor 'hostname; docker ps --filter name=luv13'`. If Tailscale is off, stop and ask; do not fall back to printing passwords.
 2. Optional full-tree dump to `/home/kor/luv` (source snapshot, not the running image).
 3. Stream web with macOS `COPYFILE_DISABLE=1`. Exclude `node_modules`, `.next`, `.git`, `.env*`, `docker-compose.yml`. Preserve remote `.env.production` + `docker-compose.yml`.
+3b. **Deleted/renamed local files linger remotely** — tar-over-ssh does not delete. Before rebuilding, `rm -f` each path the local tree removed (e.g. replaced components). Confirm nothing still imports them. Otherwise stale modules stay in the image.
 4. `cd /home/kor/luv13-web && docker compose up -d --build`. Recreates **`luv13-web` only**.
 5. Smoke on-box: `:3100/api/health`, `:3100/`, Host-header `luv13.ai` on `:80`. Confirm `luv13-api` / `luv13-proxy` Created timestamps unchanged unless those services were in scope.
 
@@ -46,6 +47,8 @@ ssh kor 'cd /home/kor/luv13-web && docker compose up -d --build'
 
 ## Pitfalls
 - Speech “luv13” / typo “lub13” = container `luv13-web`, not a rename. Do not `docker rename`.
+- **Tar sync never deletes.** If a local component is deleted/renamed, the old file survives on the box and can end up in the image. `rm -f` those paths before `docker compose up --build`.
+- Homepage copy strings change often; don’t verify by grepping for an old phrase. Grep current markers (e.g. `Hosted By Neuralwatt.com`, `Per Million Tokens`, a model name). Client-only text (cycling words, char-split reveals) won’t appear in SSR HTML.
 - Stale notes citing `71.209.199.134` are wrong; origin is `71.209.202.110`.
 - Local API scrap can lag live `billing.py`. Prefer dump-to-`/home/kor/luv` over clobbering `/home/kor/luv13-api`.
 - `kor.md` has SSH password — exclude it from dumps; never echo it.
@@ -62,13 +65,14 @@ ssh kor 'cd /home/kor/luv13-web && docker compose up -d --build'
 - [ ] Live `.env.production` / API `.env` / `config.json` / `data/` not overwritten
 
 ## Usage
-- count: 7
+- count: 8
 - 2026-08-14: Wallet API + web container deploy; NPM HTTP vhosts.
 - 2026-08-14: Domain correction — live origins are `luv13.ai` / `api.luv13.ai`. Stripe LIVE keys remain a human gate.
 - 2026-08-14: Origin cutover on `kor` (NPM `luv13.ai`→:3100).
 - 2026-09-08: Web remake via tar-over-ssh; preserved `.env.production` + `docker-compose.yml`; rebuilt `luv13-web`. Public IP `71.209.202.110`.
 - 2026-09-13: Full working tree dumped to `/home/kor/luv`; live web tar’d to `/home/kor/luv13-web`; `luv13-web` rebuilt. API/proxy left running. Tailscale path `ssh kor`.
 - 2026-09-13 (pm): Re-deploy after privacy/terms pages + hero marquee/chart/slides changes. Same flow; `luv13-web` recreated 18:09 local. `/`, `/privacy`, `/terms`, `/api/health`, vhost all 200; fonts + rasters 200; API/proxy Created unchanged.
+- 2026-09-14: Re-deploy after `text-marquee` / `decrypt-text` / `cycling-words` were replaced by `vertical-cut-reveal`. Removed those three stale files on the box before rebuild (tar sync doesn’t delete). Hero copy now “Hosted By Neuralwatt.com”. `luv13-web` recreated 20:50 local; all routes 200; API/proxy untouched.
 
 ## Verify the `/BRAND_ASSETS` navigation guard
 `middleware.ts` blocks document navigations via the `Sec-Fetch-Dest: document` request header. Plain `curl` does **not** send it, so a bare `curl .../BRAND_ASSETS/models/x.jpg` returns 200 and looks like the guard is broken. To test it, send the header:

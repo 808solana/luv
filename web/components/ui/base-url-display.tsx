@@ -1,56 +1,29 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import {
-  AnimatePresence,
-  motion,
-  useInView,
-  type Variants,
-} from "framer-motion";
+import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { Check, Copy } from "lucide-react";
 
+import { copyText } from "@/lib/clipboard";
+
 const BASE_URL = "https://api.luv13.ai/v1";
-const EASE = [0.16, 1, 0.3, 1] as const;
 
-const container: Variants = {
-  hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { staggerChildren: 0.2 } },
-};
-
-const item: Variants = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE } },
-};
-
+/**
+ * Base URL shown in the hero as a compact white-on-red pill: the URL in plain
+ * HelveticaNeue-Bold plus the copy button. It is deliberately the **same size**
+ * as the "Get API Key" button next to it (both 44px tall, 14px label) — the
+ * user asked for the two hero controls to be a matched pair (2026-09-15).
+ *
+ * The pill itself is fully transparent (`.liquid-glass-card` in globals.css:
+ * `background: transparent` + `backdrop-filter: none`), so the red inside it is
+ * pixel-identical to the red outside it — keep the type white, and do not turn
+ * this into a solid white card with black text.
+ */
 export function BaseUrlDisplay() {
-  const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-80px" });
-  const [visible, setVisible] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  useEffect(() => {
-    if (!inView) return;
-    const t = setTimeout(() => setVisible(true), 200);
-    return () => clearTimeout(t);
-  }, [inView]);
-
   const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(BASE_URL);
-    } catch {
-      const ta = document.createElement("textarea");
-      ta.value = BASE_URL;
-      ta.style.position = "fixed";
-      ta.style.opacity = "0";
-      document.body.appendChild(ta);
-      ta.select();
-      try {
-        document.execCommand("copy");
-      } catch {
-        /* no-op */
-      }
-      document.body.removeChild(ta);
-    }
+    await copyText(BASE_URL);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -58,35 +31,15 @@ export function BaseUrlDisplay() {
   const iconTransition = { type: "spring" as const, duration: 0.3, bounce: 0 };
 
   return (
-    <motion.div
-      ref={ref}
-      variants={container}
-      initial="hidden"
-      animate={visible ? "show" : "hidden"}
-      className="flex items-center gap-2 rounded-full border border-black bg-white px-5 py-3 sm:px-6 sm:py-4"
-      aria-label={`Base URL: ${BASE_URL}`}
-    >
-      <div className="flex flex-col items-start gap-0.5">
-        <motion.span
-          variants={item}
-          aria-hidden="true"
-          className="select-none text-[10px] font-bold uppercase tracking-[0.2em] text-black/70 sm:text-xs"
-        >
-          Base URL
-        </motion.span>
-        <motion.span
-          variants={item}
-          className="select-text font-mono text-sm tracking-tight text-[#111111] sm:text-lg"
-        >
-          {BASE_URL}
-        </motion.span>
-      </div>
-      <motion.button
+    <div className="liquid-glass-card flex h-11 w-fit max-w-full items-center gap-1.5 rounded-full pl-4 pr-1">
+      <span className="select-text font-sans text-sm leading-none tracking-tight text-paper">
+        {BASE_URL}
+      </span>
+      <button
         type="button"
-        variants={item}
         onClick={handleCopy}
         aria-label={copied ? "Copied" : "Copy base URL to clipboard"}
-        className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[#111111] transition-transform duration-200 hover:bg-black/5 focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_#fff,0_0_0_5px_#0d0c12] active:scale-[0.96]"
+        className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-paper transition-transform duration-200 after:absolute after:-inset-1 after:content-[''] hover:bg-white/15 focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_rgba(0,0,0,0.35),0_0_0_5px_#ffffff] active:scale-[0.96]"
       >
         <AnimatePresence initial={false}>
           {copied ? (
@@ -99,7 +52,7 @@ export function BaseUrlDisplay() {
               className="absolute inset-0 flex items-center justify-center"
             >
               <Check
-                className="h-5 w-5 text-[#16a34a]"
+                className="h-4 w-4 text-[#22c55e]"
                 strokeWidth={2.5}
                 aria-hidden="true"
               />
@@ -113,11 +66,11 @@ export function BaseUrlDisplay() {
               transition={iconTransition}
               className="absolute inset-0 flex items-center justify-center"
             >
-              <Copy className="h-5 w-5" strokeWidth={2} aria-hidden="true" />
+              <Copy className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
             </motion.span>
           )}
         </AnimatePresence>
-      </motion.button>
-    </motion.div>
+      </button>
+    </div>
   );
 }

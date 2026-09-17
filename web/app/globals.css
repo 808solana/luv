@@ -150,8 +150,8 @@
   --font-sans: "HelveticaNeue-Bold", Helvetica, Arial, sans-serif;
   --font-serif: "HelveticaNeue-Bold", Helvetica, Arial, sans-serif;
   --font-helveticaneue-bold: "HelveticaNeue-Bold", Helvetica, Arial, sans-serif;
-  --font-helveticaneue-ultralight-italic: "HelveticaNeueUltraLightItalic",
-    Helvetica, Arial, sans-serif;
+  --font-helveticaneue-ultralight-italic:
+    "HelveticaNeueUltraLightItalic", Helvetica, Arial, sans-serif;
 }
 
 @font-face {
@@ -198,7 +198,7 @@
   }
 }
 
-/* Designated subtext: Infrastructure by Neuralwatt.com, facts by openrouter.com, facts by artificialanalysis.ai */
+/* Designated subtext: Hosted By Neuralwatt.com (#models heading) only */
 .hero-neuralwatt {
   font-family: var(--font-helveticaneue-ultralight-italic);
   font-weight: 100;
@@ -311,6 +311,12 @@ body {
   padding: 0.5rem 1.25rem;
 }
 
+/* `.pill-cta-rect` (a rectangular hero CTA) was added and removed on
+   2026-09-15: the user first wanted the OpenRouter button shape, then wanted
+   that button to be the *same transparent pill* as the base-URL control beside
+   it. Both hero controls now share `.liquid-glass-card` (below). Don't re-add a
+   rectangular CTA variant unless asked. */
+
 .pill-cta-ghost {
   background: transparent;
   color: var(--pill-ink);
@@ -324,9 +330,44 @@ body {
     0 0 0 4px var(--ink);
 }
 
+/* Circular icon control — a 56px circle for icon-only buttons. The hover
+   motion is a magnetic follow applied by `MagneticButton` (a transform on the
+   wrapper), so this class deliberately has **no** hover ring and no hover
+   scale; only the press scale and the keyboard focus ring remain. The face is
+   a raster (ShieldedImage) rather than a white fill. Used by the home contact
+   form's send button. */
+.circle-cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition:
+    transform 180ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.circle-cta:active {
+  transform: scale(0.96);
+  box-shadow:
+    0 0 0 0 var(--paper),
+    0 0 0 0 var(--ink);
+}
+
+.circle-cta:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px var(--paper),
+    0 0 0 5px var(--ink);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .pill-cta:hover,
-  .pill-cta:active {
+  .pill-cta:active,
+  .circle-cta:active {
     transform: none;
     box-shadow: none;
   }
@@ -411,6 +452,209 @@ body {
   pointer-events: none;
 }
 
+/* ──────────────────────────────────────────────────────────────
+   .liquid-glass-card — the hero control surface. Shared by **both**
+   hero controls since 2026-09-15: the "Get API Key" link and the
+   base-URL pill are literally the same pill (same 44px box, same
+   white 14px label, same shadow).
+   Fully transparent: no tint, no sheen, no backdrop filter, so the
+   red field inside the pill is pixel-identical to the red outside
+   it. The only chrome is the negative space implied by the drop
+   shadow (tinted toward the field colour, not neutral black).
+   No rim/outline, no SVG refraction.
+
+   The shadow was scaled down 2026-09-15 when the panel shrank from a
+   ~140px-tall card to the 44px pill: the original 50px-blur drop
+   belonged to the big card and read as a smear under a 44px pill.
+   Same dark-red tint, same two layers, tighter offsets/blur.
+
+   **This must stay inside `@layer components`.** Every other class in
+   this file is unlayered, but the hero buttons put BOTH this class and
+   their own Tailwind utilities (hover fill, focus-visible ring) on the
+   same element — and unlayered CSS outranks *layered* CSS regardless of
+   specificity, so an unlayered `background`/`box-shadow` here silently
+   kills every `bg-*` / `shadow-*` utility on that element. In the
+   components layer the utilities still win only when they are applied,
+   so the resting pill stays fully transparent.
+   ────────────────────────────────────────────────────────────── */
+@layer components {
+  .liquid-glass-card {
+    background: transparent;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow:
+      0 8px 18px -10px rgba(72, 0, 0, 0.5),
+      0 2px 5px -2px rgba(72, 0, 0, 0.26);
+  }
+
+  /* ────────────────────────────────────────────────────────────
+     .liquid-glass-pill — the LIGHT-ground sibling of the two
+     classes above (2026-09-16, the #models "Open" pill).
+
+     `.liquid-glass` / `.liquid-glass-strong` are dark-ground
+     recipes: a white rim (invisible on white) over a near-white or
+     grey body. Dropped onto the band's `bg-white` the first would
+     vanish and the second would read as a solid grey chip. Real
+     frosted glass **over white paper reads slightly *darker* than
+     the paper**, with a specular highlight where the light hits —
+     so the body here is a whisper of ink and the highlight is a
+     white radial, and the two together are the whole effect.
+
+     There is nothing behind this pill but a flat white row, so the
+     backdrop filter is a no-op today. It is kept because it is the
+     ingredient that makes the surface a *glass* rather than a
+     gradient, and it costs one tiny composited layer.
+
+     The rim is inset `box-shadow`, not a `border` (a 1px hairline
+     reads plastic) and not the masked padding-ring that the two
+     classes above use (that ring is white, i.e. invisible here).
+     Its top layer is white-on-ink-tint, which is what makes it
+     read as an edge only because the body is tinted. Three inset
+     layers, in paint order: the bright specular, a 0.5px crisp
+     outer ring, a dark line under the bottom edge. Crispness is
+     what separates glass from a shadow blob — a soft-edged tint
+     just reads as a blurry grey pill (variant "A" in the 2026-09-16
+     style lab), and a flat ring on a white body reads as a hole
+     (which is what the user called "a bit odd").
+
+     **Keep this inside `@layer components`.** The pill also carries
+     Tailwind utilities, and unlayered CSS in this file outranks
+     layered CSS regardless of specificity — outside the layer, the
+     `background`/`box-shadow` here would silently swallow every
+     `hover:`/`focus-visible:`/`motion-reduce:` utility on the same
+     element (that is exactly what bit `.liquid-glass-card` on
+     2026-09-15).
+     ──────────────────────────────────────────────────────────── */
+  .liquid-glass-pill {
+    --glass-pill-lift:
+      inset 0 1px 1px rgba(255, 255, 255, 1),
+      inset 0 0 0 0.5px rgba(13, 12, 18, 0.07),
+      inset 0 -1px 1px rgba(13, 12, 18, 0.05), 0 1px 2px rgba(13, 12, 18, 0.09),
+      0 3px 6px -3px rgba(13, 12, 18, 0.15);
+    position: relative;
+    background: linear-gradient(
+      180deg,
+      rgba(13, 12, 18, 0.036),
+      rgba(13, 12, 18, 0.058)
+    );
+    -webkit-backdrop-filter: blur(8px) saturate(170%);
+    backdrop-filter: blur(8px) saturate(170%);
+    box-shadow: var(--glass-pill-lift);
+  }
+
+  /* Hover/focus keep the site's regrow ring so the pill still reads as one
+     of the family. On hover the ring *replaces* the lift rather than
+     stacking on it (a drop shadow inside a ring reads muddy), which is why
+     the lift comes back under reduced motion — there the follow is gone, so
+     the pill must not also lose its glass body. */
+  .liquid-glass-pill:hover {
+    box-shadow:
+      0 0 0 3px var(--paper),
+      0 0 0 4px var(--ink);
+  }
+
+  .liquid-glass-pill:focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 3px var(--paper),
+      0 0 0 5px var(--ink);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .liquid-glass-pill:hover {
+      box-shadow: var(--glass-pill-lift);
+    }
+  }
+}
+
+/* ──────────────────────────────────────────────────────────────
+   .client-marquee — full-bleed pair-with slider (#use-now).
+
+   The track holds THREE copies of the client list and travels exactly
+   one period (-100% / 3). This only lands on a period because the
+   track's `pr` equals its flex `gap`: with `pr` the width is
+   `copies × (items + gaps)`, without it the loop would jump by half a
+   gap. See client-marquee.tsx for the 3× copy duplication.
+
+   Widths are 30% smaller than the 2026-09-15 raster-refresh pass
+   (`42vw / 13rem / 15rem` -> `29.4vw / 9.1rem / 10.5rem`), at the user's
+   request: "the images are way too big". Because a smaller card shrinks
+   the loop period, the durations had to be recomputed *and* shortened —
+   the user also asked for ~10% more speed.
+
+   Duration is set per breakpoint so the travel speed stays ~10% above
+   the original ~46px/s instead of speeding up as the cards get wider.
+   One period is `copies x (clients + gaps)` — with **10 clients** (the
+   `openrouter` "Full List Here" card joined 2026-09-15) and the smaller
+   cards that is 1262.5px / 1696px / 1920px at base / sm / lg, so the
+   durations below are 25s / 33.2s / 37.4s (50.5–51.3px/s).
+   Recompute all three if the client count or the card widths change.
+   ────────────────────────────────────────────────────────────── */
+.client-marquee-viewport {
+  overflow: hidden;
+}
+
+.client-marquee {
+  --client-marquee-duration: 25s;
+  animation: client-marquee-scroll var(--client-marquee-duration) linear
+    infinite;
+  will-change: transform;
+}
+
+@media (min-width: 640px) {
+  .client-marquee {
+    --client-marquee-duration: 33.2s;
+  }
+}
+
+@media (min-width: 1024px) {
+  .client-marquee {
+    --client-marquee-duration: 37.4s;
+  }
+}
+
+/* `data-paused` is the **only** pause channel, and it comes from JS:
+   - off-screen or hidden tab (frame saving),
+   - keyboard focus inside the row (a card sliding away from a Tab user is
+     unreachable).
+   The component decides the keyboard case, not CSS, because CSS cannot tell a
+   click from a Tab — and pointer focus must **not** pause: clicking a card
+   focuses its `<a>`, which used to freeze the row until the user clicked
+   elsewhere to blur it (user, 2026-09-15). Hover deliberately does not pause
+   either ("the sliding doesn't stop… I want it to continue forever").
+   Do not re-add a `:hover` or `:focus-within` rule here. */
+.client-marquee[data-paused="true"] {
+  animation-play-state: paused;
+}
+
+@keyframes client-marquee-scroll {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-33.3333%, 0, 0);
+  }
+}
+
+/* Reduced motion: no travel at all, one copy only, and the row becomes a
+   plain horizontal scroller so every client is still reachable. */
+@media (prefers-reduced-motion: reduce) {
+  .client-marquee {
+    animation: none;
+    transform: none;
+  }
+
+  .client-marquee > [data-decorative="true"] {
+    display: none;
+  }
+
+  .client-marquee-viewport {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+  }
+}
+
 @keyframes moveBackground {
   from {
     background-position: 0% 0%;
@@ -426,33 +670,6 @@ body {
   }
   to {
     opacity: 1;
-  }
-}
-
-/* DecryptText — monochrome, inherits currentColor so it reads white-on-red in
-   the hero and ink-on-paper anywhere else. */
-.decrypt-char[data-state="scramble"] {
-  opacity: 0.4;
-}
-
-.decrypt-char[data-state="lock"] {
-  animation: decrypt-lock 380ms cubic-bezier(0.2, 0, 0, 1);
-}
-
-@keyframes decrypt-lock {
-  0% {
-    opacity: 1;
-    text-shadow: 0 0 0.45em currentColor;
-  }
-  100% {
-    opacity: 1;
-    text-shadow: 0 0 0 transparent;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .decrypt-char[data-state="lock"] {
-    animation: none;
   }
 }
 

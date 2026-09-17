@@ -4,6 +4,8 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, Copy } from "lucide-react";
 
+import { copyText } from "@/lib/clipboard";
+
 type CopyFieldProps = {
   label: string;
   value: string;
@@ -12,30 +14,11 @@ type CopyFieldProps = {
 
 const iconTransition = { type: "spring" as const, duration: 0.3, bounce: 0 };
 
-async function copyToClipboard(text: string) {
-  try {
-    await navigator.clipboard.writeText(text);
-  } catch {
-    const ta = document.createElement("textarea");
-    ta.value = text;
-    ta.style.position = "fixed";
-    ta.style.opacity = "0";
-    document.body.appendChild(ta);
-    ta.select();
-    try {
-      document.execCommand("copy");
-    } catch {
-      /* no-op */
-    }
-    document.body.removeChild(ta);
-  }
-}
-
 export function CopyField({ label, value, mono = true }: CopyFieldProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
-    await copyToClipboard(value);
+    await copyText(value);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };

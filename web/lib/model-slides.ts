@@ -1,4 +1,8 @@
-import { formatUsd, getSortPrice, type DirectoryModel } from "@/lib/model-directory";
+import {
+  formatUsd,
+  getSortPrice,
+  type DirectoryModel,
+} from "@/lib/model-directory";
 import { DIRECTORY_MODELS } from "@/lib/models";
 
 export type ModelCoverMeta = {
@@ -8,12 +12,30 @@ export type ModelCoverMeta = {
   suffix?: string;
 };
 
+/**
+ * Modalities the model accepts / returns. Only the kinds the list renders
+ * today; add another kind here and a tile in `model-pane.tsx` when a model
+ * needs it.
+ */
+export type ModalityKind = "text" | "image" | "video";
+
+export type ModelModalities = {
+  input: ModalityKind[];
+  output: ModalityKind[];
+};
+
 export type ModelCoverSlide = {
   src: string;
   alt: string;
   title: string;
   subtitle: string;
   meta: ModelCoverMeta[];
+  /** Summary of what the model does, for first-time visitors. */
+  modalities?: ModelModalities;
+  /** “Open” pill target: the model's full OpenRouter page. */
+  openHref?: string;
+  /** Non-interactive badge pill, e.g. “Neuralwatt Special”. Label only. */
+  badge?: string;
   fit?: "cover" | "contain";
   cardClassName?: string;
 };
@@ -70,6 +92,75 @@ const COVERS: Record<string, CoverArt> = {
 };
 
 /**
+ * Tourist-facing facts, one entry per model, read off that model's OpenRouter
+ * page. `modalities` is the pair the page itself states (“accepts text, images
+ * and video as input and returns text”) — or, for a text-only model, the same
+ * fact from OpenRouter's own `architecture.input_modalities` /
+ * `output_modalities` API fields, because those pages carry **no** descriptive
+ * sentence (their silence is the signal: only models with something beyond
+ * plain text get one).
+ *
+ * `openHref` is the full page the row's Open pill opens, and it is **optional on
+ * purpose**: a row can carry modalities without a pill. Kimi K3 Fast is that
+ * case — it is a faster serving tier of Kimi K3 and has no page of its own on
+ * OpenRouter (the only Kimi K3 entries are `moonshotai/kimi-k3` and its
+ * `:batch` variant), so pointing its pill at the K3 page would claim a page that
+ * is not about this row. Its modalities are shared with K3.
+ *
+ * A model with no entry here renders no Modalities line and no Open pill, so
+ * rows can be filled in one at a time.
+ *
+ * `badge` is the third possibility: a **label, not a link** — a plain pill with
+ * no `href`, no tap target and no hover/press response (see `SpecialPill` in
+ * `model-pane.tsx`). Kimi K3 Fast is its only user: it has no page of its own,
+ * so instead of a pill that goes nowhere it carries the “Neuralwatt Special”
+ * marker. Do not wire it to an `href` — a pill that says where the model comes
+ * from and a pill that takes you somewhere are different objects, and a
+ * non-interactive pill must not borrow the click affordances (pointer follow,
+ * ring, `::after` hit box) of an interactive one.
+ *
+ * Verified against `GET https://openrouter.ai/api/v1/models` (and the pages
+ * themselves) on 2026-09-16. Note the OpenRouter slug is **not** derivable from
+ * the caption `ID`: our `qwen-3.8-27b` is OpenRouter's `qwen/qwen3.8-27b`.
+ */
+type ModelDetail = {
+  openHref?: string;
+  badge?: string;
+  modalities: ModelModalities;
+};
+
+const DETAILS: Record<string, ModelDetail> = {
+  "kimi-k3": {
+    openHref: "https://openrouter.ai/moonshotai/kimi-k3",
+    modalities: { input: ["text", "image", "video"], output: ["text"] },
+  },
+  "kimi-k3-fast": {
+    badge: "Neuralwatt Special",
+    modalities: { input: ["text", "image", "video"], output: ["text"] },
+  },
+  "glm-5-3": {
+    openHref: "https://openrouter.ai/z-ai/glm-5.3",
+    modalities: { input: ["text"], output: ["text"] },
+  },
+  "glm-5-3-flash": {
+    openHref: "https://openrouter.ai/z-ai/glm-5.3-flash",
+    modalities: { input: ["text", "image", "video"], output: ["text"] },
+  },
+  "deepseek-v4-1-flash": {
+    openHref: "https://openrouter.ai/deepseek/deepseek-v4.1-flash",
+    modalities: { input: ["text", "image"], output: ["text"] },
+  },
+  "deepseek-v4-pro": {
+    openHref: "https://openrouter.ai/deepseek/deepseek-v4-pro",
+    modalities: { input: ["text"], output: ["text"] },
+  },
+  "qwen-3-8-27b": {
+    openHref: "https://openrouter.ai/qwen/qwen3.8-27b",
+    modalities: { input: ["text", "image", "video"], output: ["text"] },
+  },
+};
+
+/**
  * Home model list — title is the model name; caption rows are
  * Context / Price / ID. Stacked compact rows.
  *
@@ -105,6 +196,7 @@ export const MODEL_PANE_SLIDES: ModelCoverSlide[] = DIRECTORY_MODELS.filter(
   })
   .map((model) => {
     const cover = COVERS[model.id];
+    const detail = DETAILS[model.id];
     return {
       src: cover?.src ?? DEEPSEEK.src,
       alt: cover?.alt ?? `${model.name} cover`,
@@ -112,6 +204,9 @@ export const MODEL_PANE_SLIDES: ModelCoverSlide[] = DIRECTORY_MODELS.filter(
       subtitle: model.identifier,
       fit: cover?.fit,
       cardClassName: cover?.cardClassName,
+      modalities: detail?.modalities,
+      openHref: detail?.openHref,
+      badge: detail?.badge,
       meta: [
         { label: "Context", value: "1 million" },
         {
