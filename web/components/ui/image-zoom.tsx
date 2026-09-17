@@ -55,9 +55,15 @@ const clamp = (value: number, min: number, max: number) =>
  * Zoom is anchored: a pinch, a wheel notch and a double-tap all scale around
  * the point under your fingers/cursor rather than the centre of the screen.
  *
- * Given `onPrev`/`onNext` it becomes a viewer *of a set*: `‹ ›` float over the
- * raster so the next chart is one press away instead of close → step in the
- * carousel → zoom again. Stepping deliberately **keeps the transform** (the
+ * Given `onPrev`/`onNext` it becomes a viewer *of a set*: `‹ ›` are always on
+ * screen so the next chart is one press away instead of close → step in the
+ * carousel → zoom again. They **float over the raster from `sm` up**, where
+ * there is room to spare, and **drop into their own row under it on phones**:
+ * a 375px stage is exactly the raster's width at fit, so a floating 44px pill
+ * each side sits on ~12% of the chart. Below `sm` the row is in flow (arrow ·
+ * `1 / 2` · arrow) and nothing is covered; from `sm` up it is the
+ * `absolute inset-0` overlay it has always been, and the chip goes back to the
+ * stage's bottom centre. Stepping deliberately **keeps the transform** (the
  * set shares one ratio, so `2.4×` on chart 1 is the same crop of chart 2) —
  * the zoom the visitor framed survives the step.
  */
@@ -509,6 +515,11 @@ export function ImageZoomOverlay({
   };
 
   const zoomed = applied.scale > MIN_SCALE + 0.001;
+  /** `1 / 2`, or `null` when the viewer was not given a set to describe. */
+  const positionChip =
+    position && position.total > 1
+      ? `${position.index} / ${position.total}`
+      : null;
   const boxStyle: CSSProperties = {
     width: box.width,
     height: box.height,
@@ -523,12 +534,15 @@ export function ImageZoomOverlay({
   const control =
     "flex size-11 items-center justify-center rounded-full bg-paper text-ink transition-transform duration-150 ease-out active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-paper focus-visible:ring-offset-2 focus-visible:ring-offset-ink disabled:opacity-40 disabled:active:scale-100";
 
-  // Floating steppers. They are siblings of the stage rather than children of
-  // it, so a press on one never enters the stage's pointer stream — otherwise
-  // `endPointer` would read the press as a tap on the ground and dismiss the
-  // viewer. Slightly translucent: at high zoom they do sit over the raster.
+  // Steppers. From `sm` up they float: a sibling row of the stage rather than
+  // children of it, so a press on one never enters the stage's pointer stream —
+  // otherwise `endPointer` would read the press as a tap on the ground and
+  // dismiss the viewer. On phones the same row is *in flow under the stage*
+  // (`sm:absolute` is what turns it back into an overlay), because at 375px the
+  // fit view is the full stage width and a floating pill would cover the chart.
+  // Slightly translucent only where it actually overlaps the raster.
   const navControl =
-    "pointer-events-auto flex size-11 items-center justify-center rounded-full bg-paper/85 text-ink shadow-[0_10px_30px_-12px_rgba(0,0,0,0.9)] backdrop-blur-sm transition-transform duration-150 ease-out active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-paper focus-visible:ring-offset-2 focus-visible:ring-offset-ink";
+    "pointer-events-auto flex size-11 items-center justify-center rounded-full bg-paper text-ink shadow-[0_10px_30px_-12px_rgba(0,0,0,0.9)] transition-transform duration-150 ease-out active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-paper focus-visible:ring-offset-2 focus-visible:ring-offset-ink sm:bg-paper/85 sm:backdrop-blur-sm";
 
   return createPortal(
     <div
@@ -585,8 +599,8 @@ export function ImageZoomOverlay({
           </div>
         </div>
 
-        {onPrev || onNext ? (
-          <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-between px-2 sm:px-4">
+        {onPrev || onNext || positionChip ? (
+          <div className="pointer-events-none z-10 flex shrink-0 items-center justify-center gap-3 py-2.5 sm:absolute sm:inset-0 sm:justify-between sm:gap-0 sm:px-4 sm:py-0">
             {onPrev ? (
               <button
                 type="button"
@@ -596,6 +610,17 @@ export function ImageZoomOverlay({
               >
                 <ChevronLeft size={22} strokeWidth={2.5} />
               </button>
+            ) : null}
+            {positionChip ? (
+              // In flow between the arrows on phones; from `sm` up it is
+              // absolute inside this `inset-0` row, i.e. the stage's bottom
+              // centre, exactly where it has always been.
+              <p
+                role="status"
+                className="pointer-events-none rounded-full bg-ink/70 px-2.5 py-1 text-[11px] tabular-nums text-paper/70 backdrop-blur-sm sm:absolute sm:bottom-3 sm:left-1/2 sm:-translate-x-1/2"
+              >
+                {positionChip}
+              </p>
             ) : null}
             {onNext ? (
               <button
@@ -608,15 +633,6 @@ export function ImageZoomOverlay({
               </button>
             ) : null}
           </div>
-        ) : null}
-
-        {position && position.total > 1 ? (
-          <p
-            role="status"
-            className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-ink/70 px-2.5 py-1 text-[11px] tabular-nums text-paper/70 backdrop-blur-sm"
-          >
-            {position.index} / {position.total}
-          </p>
         ) : null}
       </div>
 

@@ -9,6 +9,7 @@ export const DIRECTORY_MODELS: DirectoryModel[] = [
     id: "kimi-k3",
     name: "Kimi K3",
     identifier: "kimi-k3",
+    modelId: "luv13/kimi-k3",
     provider: "MoonshotAI",
     description:
       "Moonshot AI Kimi K3 — multimodal 2.8T MoE, 1M context.",
@@ -29,6 +30,7 @@ export const DIRECTORY_MODELS: DirectoryModel[] = [
     id: "kimi-k3-fast",
     name: "Kimi K3 Fast",
     identifier: "kimi-k3-fast",
+    modelId: "luv13/kimi-k3-fast",
     provider: "MoonshotAI",
     description:
       "Moonshot AI Kimi K3 with thinking mode disabled for instant, lower-latency responses.",
@@ -49,6 +51,7 @@ export const DIRECTORY_MODELS: DirectoryModel[] = [
     id: "glm-5-3",
     name: "GLM 5.3",
     identifier: "glm-5.3",
+    modelId: "luv13/glm-5.3",
     provider: "ZhipuAI",
     description:
       "ZhipuAI GLM 5.3 with always-on reasoning and 1M context window.",
@@ -69,6 +72,7 @@ export const DIRECTORY_MODELS: DirectoryModel[] = [
     id: "glm-5-3-flash",
     name: "GLM-5.3 Flash",
     identifier: "glm-5.3-flash",
+    modelId: "luv13/glm-5.3-flash",
     provider: "ZhipuAI",
     description:
       "ZhipuAI GLM-5.3 Flash with vision, tools, flex, and always-on reasoning.",
@@ -109,6 +113,7 @@ export const DIRECTORY_MODELS: DirectoryModel[] = [
     id: "deepseek-v4-1-flash",
     name: "DeepSeek V4.1 Flash",
     identifier: "deepseek-v4.1-flash",
+    modelId: "luv13/deepseek-v4.1-flash",
     provider: "DeepSeek",
     description:
       "DeepSeek V4.1 Flash — MoE with tool calling and adjustable reasoning effort. 1M-token native context.",
@@ -129,6 +134,7 @@ export const DIRECTORY_MODELS: DirectoryModel[] = [
     id: "deepseek-v4-pro",
     name: "DeepSeek V4-Pro",
     identifier: "deepseek-v4-pro",
+    modelId: "luv13/deepseek-v4-pro",
     provider: "DeepSeek",
     description:
       "Higher-quality DeepSeek Pro route; request access while in preview.",
@@ -190,6 +196,7 @@ export const DIRECTORY_MODELS: DirectoryModel[] = [
     id: "qwen-3-8-27b",
     name: "Qwen 3.8 27B",
     identifier: "qwen-3.8-27b",
+    modelId: "luv13/qwen-3.8-27b",
     provider: "Qwen",
     description:
       "Qwen3.8-27B — dense 27B VL model with MTP speculative decoding, native 262K context.",

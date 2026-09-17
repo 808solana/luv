@@ -8,6 +8,7 @@ import {
 
 import { ShieldedImage } from "@/components/ui/shielded-image";
 import { MagneticButton } from "@/components/ui/magnetic-button";
+import { ModelIdCopy } from "@/components/models/model-id-copy";
 import {
   MODEL_PANE_SLIDES,
   type ModalityKind,
@@ -201,22 +202,23 @@ function ModelRow({ slide }: { slide: ModelCoverSlide }) {
                   {row.label}
                   {row.suffix ? ":" : ""}
                 </dt>
-                <dd
-                  className={cn(
-                    "font-medium text-black",
-                    row.label === "ID"
-                      ? "font-mono text-black/70"
-                      : "tabular-nums",
-                  )}
-                >
-                  {row.value}
-                  {row.suffix ? (
-                    <span className="font-normal normal-nums text-black">
-                      {"\u00a0\u00a0"}
-                      {row.suffix}
-                    </span>
-                  ) : null}
-                </dd>
+                {row.copy ? (
+                  /* The customer ID is the one string on the row a visitor
+                     has to copy, so its value *is* a copy control. */
+                  <dd className="font-medium text-black">
+                    <ModelIdCopy id={row.value} />
+                  </dd>
+                ) : (
+                  <dd className="font-medium tabular-nums text-black">
+                    {row.value}
+                    {row.suffix ? (
+                      <span className="font-normal normal-nums text-black">
+                        {"\u00a0\u00a0"}
+                        {row.suffix}
+                      </span>
+                    ) : null}
+                  </dd>
+                )}
               </div>
             ))}
           </dl>

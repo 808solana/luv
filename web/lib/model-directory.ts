@@ -43,7 +43,21 @@ export type ModelCta = "try_now" | "request_access";
 export type DirectoryModel = {
   id: string;
   name: string;
+  /** Portal / OpenRouter slug — the catalog and dedup key. Not customer-facing. */
   identifier: string;
+  /**
+   * The **customer-facing LUV13 model ID** (e.g. `luv13/deepseek-v4-pro`) — what
+   * a customer pastes into their client, and what the `#models` pane's `ID`
+   * caption shows. Distinct from `identifier` on purpose: `identifier` is the
+   * upstream slug (dots, no brand prefix) and must keep matching the provider
+   * for dedup, while this is the branded public ID.
+   *
+   * Optional because the user supplies these by hand, one catalog row at a time
+   * (2026-09-16). A row without one renders **no** `ID` caption at all rather
+   * than falling back to the unbranded portal slug — publishing a non-LUV13 ID
+   * under a caption that promises a customer ID would be a false promise.
+   */
+  modelId?: string;
   provider: string;
   description: string;
   capabilities: Capability[];
@@ -204,6 +218,7 @@ export function filterModels(
     const searchableText = [
       model.name,
       model.identifier,
+      model.modelId,
       model.provider,
       model.description,
       ...model.capabilities,

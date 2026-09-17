@@ -568,36 +568,50 @@ body {
 }
 
 /* ──────────────────────────────────────────────────────────────
-   .client-marquee — full-bleed pair-with slider (#use-now).
+   .client-marquee — full-bleed "Use With" slider (#use-now).
 
-   The track holds THREE copies of the client list and travels exactly
-   one period (-100% / 3). This only lands on a period because the
-   track's `pr` equals its flex `gap`: with `pr` the width is
-   `copies × (items + gaps)`, without it the loop would jump by half a
-   gap. See client-marquee.tsx for the 3× copy duplication.
+   The track holds THREE copies of the client list so the travel is
+   endless: the row's position is folded back into one *period*, and `pr`
+   here equals the flex `gap`, so the track is exactly
+   `copies × (items + gaps)` wide and copy 2 begins exactly one period
+   after copy 1. See client-marquee.tsx for the 3× duplication.
 
-   Widths are 30% smaller than the 2026-09-15 raster-refresh pass
-   (`42vw / 13rem / 15rem` -> `29.4vw / 9.1rem / 10.5rem`), at the user's
-   request: "the images are way too big". Because a smaller card shrinks
-   the loop period, the durations had to be recomputed *and* shortened —
-   the user also asked for ~10% more speed.
+   The position is **owned by JS** — a `translate3d` written from the rAF
+   loop in the component, and only while the row is on screen. This used
+   to be the `client-marquee-scroll` keyframe; a swipe has to hold the
+   position, drag it backwards past the period, and hand a fractional
+   phase back to the travel, and an animation's phase can only be
+   re-seeded through `animation-delay` — mid-flight that is a restart in
+   some engines and a shift in others, so the row jumps on release.
 
-   Duration is set per breakpoint so the travel speed stays ~10% above
-   the original ~46px/s instead of speeding up as the cards get wider.
-   One period is `copies x (clients + gaps)` — with **10 clients** (the
-   `openrouter` "Full List Here" card joined 2026-09-15) and the smaller
-   cards that is 1262.5px / 1696px / 1920px at base / sm / lg, so the
-   durations below are 25s / 33.2s / 37.4s (50.5–51.3px/s).
-   Recompute all three if the client count or the card widths change.
+   `--client-marquee-duration` is still the speed knob: the loop reads it
+   and travels `period / duration` px/s, so the numbers below must keep
+   holding ~51px/s. Durations are per breakpoint because the period grows
+   with the cards: `copies × (clients + gaps)` with **10 clients** (the
+   `openrouter` "Full List Here" card joined 2026-09-15) is
+   1262.5px / 1696px / 1920px at base / sm / lg, hence 25s / 33.2s /
+   37.4s (50.5–51.3px/s). Recompute all three if the client count or a
+   card width changes.
+
+   `data-paused` (set from JS) reports the travel state — off-screen,
+   hidden tab, keyboard focus inside the row, or a finger/grace hold. It
+   is observability now, not a pause channel: there is no CSS animation
+   left to pause, and hover must never stop the row.
    ────────────────────────────────────────────────────────────── */
 .client-marquee-viewport {
   overflow: hidden;
+  /* Horizontal gestures belong to the row (the swipe in
+     client-marquee.tsx); vertical ones stay the page's, so a thumb that
+     lands on a mark still scrolls the site. Without this the browser
+     treats the first horizontal move as a pan and cancels the gesture. */
+  touch-action: pan-y;
+  /* Dragging the row must never paint a text selection over the names. */
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .client-marquee {
   --client-marquee-duration: 25s;
-  animation: client-marquee-scroll var(--client-marquee-duration) linear
-    infinite;
   will-change: transform;
 }
 
@@ -613,37 +627,10 @@ body {
   }
 }
 
-/* `data-paused` is the **only** pause channel, and it comes from JS:
-   - off-screen or hidden tab (frame saving),
-   - keyboard focus inside the row (a card sliding away from a Tab user is
-     unreachable).
-   The component decides the keyboard case, not CSS, because CSS cannot tell a
-   click from a Tab — and pointer focus must **not** pause: clicking a card
-   focuses its `<a>`, which used to freeze the row until the user clicked
-   elsewhere to blur it (user, 2026-09-15). Hover deliberately does not pause
-   either ("the sliding doesn't stop… I want it to continue forever").
-   Do not re-add a `:hover` or `:focus-within` rule here. */
-.client-marquee[data-paused="true"] {
-  animation-play-state: paused;
-}
-
-@keyframes client-marquee-scroll {
-  from {
-    transform: translate3d(0, 0, 0);
-  }
-  to {
-    transform: translate3d(-33.3333%, 0, 0);
-  }
-}
-
-/* Reduced motion: no travel at all, one copy only, and the row becomes a
-   plain horizontal scroller so every client is still reachable. */
+/* Reduced motion: no travel at all (the loop is gated off in JS), one copy
+   only, and the row becomes a plain horizontal scroller so every client is
+   still reachable — the swipe, without the auto-spin. */
 @media (prefers-reduced-motion: reduce) {
-  .client-marquee {
-    animation: none;
-    transform: none;
-  }
-
   .client-marquee > [data-decorative="true"] {
     display: none;
   }
@@ -651,6 +638,9 @@ body {
   .client-marquee-viewport {
     overflow-x: auto;
     overflow-y: hidden;
+    /* The drag contract above goes with the JS loop; this scroller needs the
+       horizontal axis back (and pinch-zoom with it). */
+    touch-action: auto;
     scroll-snap-type: x mandatory;
   }
 }

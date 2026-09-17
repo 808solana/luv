@@ -10,6 +10,12 @@ export type ModelCoverMeta = {
   value: string;
   /** Extra phrase after the value, e.g. “Per Million Tokens”. */
   suffix?: string;
+  /**
+   * Render `value` as the pane's click-to-copy control instead of plain text.
+   * Set on the `ID` caption only — its value is the customer-facing LUV13 ID,
+   * which is the one string on a row a visitor actually has to copy.
+   */
+  copy?: boolean;
 };
 
 /**
@@ -164,6 +170,10 @@ const DETAILS: Record<string, ModelDetail> = {
  * Home model list — title is the model name; caption rows are
  * Context / Price / ID. Stacked compact rows.
  *
+ * The `ID` caption shows the **customer-facing LUV13 ID** (`luv13/…`, from
+ * `DirectoryModel.modelId`) as a click-to-copy control since 2026-09-16, not
+ * the upstream `identifier` it used to print. See `ModelIdCopy`.
+ *
  * Hide GLM-5.2 (older sibling of 5.3), DeepSeek V4 Flash (superseded by
  * V4.1 Flash on the pane), the embedding model (not a chat row), and
  * Gemma until a family mark exists (no whale fallback).
@@ -197,24 +207,33 @@ export const MODEL_PANE_SLIDES: ModelCoverSlide[] = DIRECTORY_MODELS.filter(
   .map((model) => {
     const cover = COVERS[model.id];
     const detail = DETAILS[model.id];
+
+    // Caption rows. The `ID` caption carries the **customer-facing LUV13 ID**
+    // and is click-to-copy in the pane; a model the user has not supplied an ID
+    // for renders no caption at all, because the unbranded portal slug is not a
+    // stand-in for one (see `DirectoryModel.modelId`).
+    const meta: ModelCoverMeta[] = [
+      { label: "Context", value: "1 million" },
+      {
+        label: "Price",
+        value: formatPaneAmount(model),
+        suffix: "Per Million Tokens",
+      },
+    ];
+    if (model.modelId) {
+      meta.push({ label: "ID", value: model.modelId, copy: true });
+    }
+
     return {
       src: cover?.src ?? DEEPSEEK.src,
       alt: cover?.alt ?? `${model.name} cover`,
       title: model.name,
-      subtitle: model.identifier,
+      subtitle: model.modelId ?? model.identifier,
       fit: cover?.fit,
       cardClassName: cover?.cardClassName,
       modalities: detail?.modalities,
       openHref: detail?.openHref,
       badge: detail?.badge,
-      meta: [
-        { label: "Context", value: "1 million" },
-        {
-          label: "Price",
-          value: formatPaneAmount(model),
-          suffix: "Per Million Tokens",
-        },
-        { label: "ID", value: model.identifier },
-      ],
+      meta,
     };
   });

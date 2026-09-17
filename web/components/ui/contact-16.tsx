@@ -60,7 +60,7 @@ const CONTACT_LINKS: readonly ContactLink[] = [
  * is still selectable as text (`select-text`), so a visitor who would rather
  * copy it by hand still can.
  */
-const CONTACT_EMAIL = "hi@luv13.com";
+const CONTACT_EMAIL = "hi@luv13.ai";
 
 /** How long the copy affordances show their copied state. */
 const COPIED_HOLD_MS = 2000;
@@ -114,7 +114,8 @@ function focusAndReveal(field: HTMLInputElement | HTMLTextAreaElement) {
  * the home page. It opens with a centered `Contact` `<h2>` set in the same type
  * as the `#use-now` heading; below that the form is **centered on the page**
  * (like the heading) and the contact column (`CONTACT_LINKS` + the copyable
- * `CONTACT_EMAIL`) hangs off its right-hand side. No
+ * `CONTACT_EMAIL`) hangs off its right-hand side at `xl`+, and stacks
+ * **centered under the send button** at every narrower width. No
  * vertical padding of its own — the gap above comes from `#use-now`'s bottom
  * padding, and the page's bottom whitespace comes from the footer that follows
  * it.
@@ -246,21 +247,24 @@ export function Contact16() {
           (`gap-x-16` = 64px). The first track is deliberately empty — it is the
           left gutter that balances the links' column.
 
-          Below `xl` the links are `hidden` and the grid is a single column, so
-          the phone and tablet layout is unchanged; the mobile contact UI is a
-          separate design that has not been specified yet.
+          Below `xl` the grid is a single column and the links stack **under**
+          the form — centered, one row each — which is the mobile contact UI
+          the user specified (2026-09-16: *"move the Instagram, the X, and the
+          email under the contact form, centered… under the send button"*).
+          The 56px between the send button and the first row is the grid's
+          `gap-y-14`.
 
           **`xl` and not `lg`/`md`:** a `1fr` track never shrinks below its
           content, so an over-wide side column silently takes width from the
           other side track and pushes the form off center. The side tracks are
           `(container − 512 − 128) / 2`, i.e. 144px at 1024 and 256px at 1280.
           The widest row is now the email row — the address is one unbreakable
-          token at 148.9px, plus 8px gap plus the 36px copy button = **192.9px**
-          — which does not fit 144px (the address alone does not), so at `lg`
-          the grid would warp and the form would sit ~24px left of the heading.
-          At `xl` the 256px tracks leave 63px of slack. (`md` was already out:
-          ~80px tracks even against the old 110px `Instagram` label.)
-          2026-09-16, when the mailto link became the copyable address. */}
+          token at 119.3px, plus 8px gap plus the 36px copy button = **163.3px**
+          — which does not fit 144px, so at `lg` the grid would warp and the
+          form would sit ~24px left of the heading. At `xl` the 256px tracks
+          leave 92.7px of slack. (`md` was already out: ~80px tracks even
+          against the old 110px `Instagram` label.) 2026-09-16, when the mailto
+          link became the copyable address. */}
       <div className="mx-auto grid w-full max-w-6xl gap-y-14 xl:grid-cols-[1fr_32rem_1fr] xl:items-start xl:gap-x-16">
         <form
           ref={formRef}
@@ -373,17 +377,23 @@ export function Contact16() {
           </MagneticButton>
         </form>
 
-        {/* Desktop (`xl`+) contact column — bare text, no pill. The links wear
-            the site's regrow focus ring for keyboard users and an underline on
-            hover, because a link with no shape has to say so some other way.
-            The email row ends the list: the address itself is the copy control,
-            with an icon beside it as the second, pointer-sized way to copy.
+        {/* Contact column — bare text, no pill. The links wear the site's
+            regrow focus ring for keyboard users and an underline on hover,
+            because a link with no shape has to say so some other way. The email
+            row ends the list: the address itself is the copy control, with an
+            icon beside it as the second, pointer-sized way to copy.
 
-            All three rows share one flat `text-2xl`: the column is `xl`-only,
-            so the `text-xl md:text-2xl` ladder it used to carry could never
-            reach its first rung. */}
-        <div className="hidden xl:col-start-3 xl:flex xl:flex-col">
-          <ul className="flex flex-col gap-4">
+            **It renders at every width** (2026-09-16): from `xl` up it hangs off
+            the form's right-hand side; below `xl` the single-track grid stacks
+            it *under* the form (the send button's row) and it is centered —
+            `items-center` on both the column and the `<ul>`, reverted to
+            `items-start` at `xl` so the desktop column stays flush left. The
+            stacked gap is the grid's own `gap-y-14` (56px under the send
+            button), which is the "reasonable padding" the user asked for.
+
+            All three rows share one flat `text-2xl`. */}
+        <div className="flex flex-col items-center xl:col-start-3 xl:items-start">
+          <ul className="flex flex-col items-center gap-4 xl:items-start">
             {CONTACT_LINKS.map((link) => (
               <li key={link.label}>
                 <a

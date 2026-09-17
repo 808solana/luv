@@ -1,6 +1,6 @@
 ---
 name: copy-to-clipboard-component
-description: Use when building or changing a "copy to clipboard" control in this app — the shared copyText() helper in web/lib/clipboard.ts, the execCommand fallback and its focus theft, the icon cross-fade, and the one-action-one-tab-stop rule for duplicate controls.
+description: Use when building or changing a "copy to clipboard" control in this app — the shared copyText() helper in web/lib/clipboard.ts, the execCommand fallback and its focus theft, the icon cross-fade, the one-action-one-tab-stop rule for duplicate controls, and how the control scales down to a text line.
 created: 2026-07-03
 updated: 2026-09-16
 tags: [frontend, react, next, animation, accessibility, clipboard]
@@ -11,11 +11,11 @@ tags: [frontend, react, next, animation, accessibility, clipboard]
 ## When to Use
 - Adding a "copy this text" button next to a code block, URL, API key, token, snippet, or e-mail address.
 - Needing SSR-safe behavior (no hydration mismatch) with a satisfying copied-confirmation animation.
-- Making a piece of visible text itself click-to-copy (e.g. the contact section's `hi@luv13.com`) with an optional icon button beside it.
+- Making a piece of visible text itself click-to-copy (e.g. the contact section's `hi@luv13.ai`) with an optional icon button beside it.
 - Don't use when: the control should *navigate* (`mailto:`, a URL) — that is an `<a>`, not a copy control.
 
 ## Steps
-1. **Always import the shared helper — never rewrite the fallback.** `import { copyText } from "@/lib/clipboard";` then `await copyText(value)`. It is the single implementation of: `navigator.clipboard.writeText` first, and on rejection a hidden `<textarea>` + `document.execCommand("copy")`. Callers: `base-url-display.tsx` (hero base-URL pill), `copy-field.tsx`, `contact-16.tsx` (the e-mail row). **Adding a fourth inline copy of that block is the failure mode this helper exists to prevent.**
+1. **Always import the shared helper — never rewrite the fallback.** `import { copyText } from "@/lib/clipboard";` then `await copyText(value)`. It is the single implementation of: `navigator.clipboard.writeText` first, and on rejection a hidden `<textarea>` + `document.execCommand("copy")`. Callers: `base-url-display.tsx` (hero base-URL pill), `copy-field.tsx`, `contact-16.tsx` (the e-mail row), `models/model-id-copy.tsx` (a model's customer LUV13 ID in the `#models` pane). **Adding a fifth inline copy of that block is the failure mode this helper exists to prevent.**
 2. Component is `"use client"` — clipboard + animation are client-only.
 3. Set `copied=true`, clear it in a `useEffect` **keyed on the flag** (not a bare `setTimeout` in the handler) so the timer is cleared on unmount:
    ```tsx
@@ -38,7 +38,14 @@ The contact e-mail row is the reference shape: the address is a `<button>` whose
 - The **icon button** is marked `aria-hidden="true"` and `tabIndex={-1}`. It is a duplicate of an action already exposed; leaving it focusable gives keyboard users two stops, two names, and one action.
 - Because the icon is hidden from AT, add a `role="status"` `sr-only` region (`${EMAIL} copied to clipboard`) to announce success — `role="status"` carries implicit `aria-live="polite"` + `aria-atomic`.
 - Keep the text control's classes otherwise identical to its neighbouring links (`cursor-pointer` + `select-text` were the only deltas in the contact row), so it reads as one of the set. `select-text` lets someone copy by hand.
-- Verified result: the a11y tree lists `button Copy hi@luv13.com to clipboard` and **no** icon button; the tab order through the section is 6 stops, not 7.
+- Verified result: the a11y tree lists `button Copy hi@luv13.ai to clipboard` and **no** icon button; the tab order through the section is 6 stops, not 7.
+
+## Scale is a parameter, not a constant
+
+The two controls and the 2000ms hold are fixed; **the size is not**. The hero pill's icon button is 36px and the contact row's is 36px, but `models/model-id-copy.tsx` runs at **13px / `sm:size-4`** with `after:-inset-2` (~29/32px target) because it sits inside a 16.1px meta line in a 90px row. Two rules make that legitimate rather than sloppy:
+
+- **The face must stay inside its line box** when it sits in text. A face taller than the line grows the line, which here means growing *every* row of the list — measure the row box before and after any edit.
+- **The `::after` target is only as big as its neighbours allow.** A 44px box on a text line covers most of the row and swallows taps meant for the title and the pill below, so the target shrinks with the face. State the real number (~29/32px) in the component's docstring; do not claim 44.
 
 ## Pitfalls
 
@@ -63,6 +70,7 @@ The contact e-mail row is the reference shape: the address is a `<button>` whose
 - [ ] `npm run build` exits 0 with no TS errors.
 
 ## Usage
-- count: 3
-- 2026-09-16 — extracted `copyText()` into `web/lib/clipboard.ts` and pointed `base-url-display.tsx` + `copy-field.tsx` at it; used it for the new contact-section e-mail row (`hi@luv13.com`, click-to-copy text + icon twin). Found and fixed the fallback's focus theft, and documented the `aria-hidden`/`tabIndex={-1}` pattern for a duplicate pointer affordance.
+- count: 4
+- 2026-09-16 (2) — **fourth caller: the `#models` pane's customer LUV13 ID** (`web/components/models/model-id-copy.tsx`). Same two-controls-one-action shape as the e-mail row, but at *text-line* scale: the ID is the `<button>`, the icon twin is `aria-hidden` + `tabIndex={-1}` (so the pane row still has exactly one tab stop for it), a `role="status"` `sr-only` line announces the copy, `copyText()` does the work, 2000ms hold. The one thing that changed with the caller is **scale** — the face is `13px` / `sm:size-4` with `after:-inset-2` (~29/32px), deliberately under the 44px floor, because a 44px face would grow the 16.1px meta line and therefore every one of the seven 90px rows, and a 44px target would swallow taps meant for the title and the pill below. Verified live: copy wrote `luv13/glm-5.3`, the status line announced it, the label reverted, the row box stayed at 89.97px. Two new tests pin the primary path, the `execCommand` fallback (no textarea left behind), the single-tab-stop property and the 2000ms revert (`npm test`, 16 ✓).
+- 2026-09-16 — extracted `copyText()` into `web/lib/clipboard.ts` and pointed `base-url-display.tsx` + `copy-field.tsx` at it; used it for the new contact-section e-mail row (`hi@luv13.ai`, click-to-copy text + icon twin). Found and fixed the fallback's focus theft, and documented the `aria-hidden`/`tabIndex={-1}` pattern for a duplicate pointer affordance.
 - 2026-08-13: Reused for one-time API-key, base URL, model slug, and curl copy controls.
