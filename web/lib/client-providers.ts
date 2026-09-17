@@ -8,6 +8,34 @@ export type ClientProvider = {
 };
 
 /**
+ * Cache-bust token for the client rasters — **bump this whenever a raster's
+ * bytes change but its filename does not.**
+ *
+ * Next serves `public/` with `cache-control: public, max-age=0`, which is
+ * exactly what you want for a re-cut in place: the browser revalidates on every
+ * load and the ETag does the rest. Cloudflare breaks that contract — it hands
+ * the *browser* `public, max-age=14400` (its default Browser Cache TTL,
+ * overriding the origin) and revalidates at the edge instead. So for four
+ * hours after a re-cut, a browser that already has the old bytes never asks
+ * again, and `kilo-code.png` keeps painting its superseded 256×256 mark through
+ * deploy after deploy while the origin and the edge are both already correct
+ * (reported 2026-09-16, after two deploys).
+ *
+ * The same trap silently swallowed the other four 2026-09-16 re-cuts that kept
+ * their filenames (`codex`, `freebuff`, `hermes`, `open-webui`); only Kilo was
+ * *visibly* wrong because its new art is a different design rather than a
+ * higher-resolution cut of the same one. A version query moves every one of
+ * them to a fresh URL, which no browser or edge cache can answer from the old
+ * entry — and it keeps the one-filename-per-brand convention intact, because
+ * the path is still `clients/<brand>.png`.
+ */
+const RASTER_VERSION = "2";
+
+/** `/BRAND_ASSETS/clients/<brand>.png?v=<RASTER_VERSION>` */
+const mark = (brand: string) =>
+  `/BRAND_ASSETS/clients/${brand}.png?v=${RASTER_VERSION}`;
+
+/**
  * Use-with clients under **Use With**. One full-bleed marquee of
  * marks + names — no kind ("Coding agent"), no Free/Paid, no Open pill.
  * The 2026-09-15 trim dropped `kind` / `access` / `alt`: the row is an image
@@ -20,6 +48,9 @@ export type ClientProvider = {
  * convention (`claude`, `cline`, `codex`, `cursor`, `freebuff`, `hermes`,
  * `kilo-code`, `open-webui`, `openrouter`, `vs-code`). `cursor` and `vs-code`
  * used to be `.jpg`; nothing else should reintroduce a second extension here.
+ * Every `src` is built by `mark()`, so it carries the `?v=` cache-bust token —
+ * a bare path here would be invisible to anyone who cached the old bytes
+ * (`RASTER_VERSION` above).
  *
  * `name` is the **visible card label** and the accessible name
  * (`Open ${name} on OpenRouter`), so it must be the string the user expects to
@@ -31,43 +62,43 @@ export const CLIENT_PROVIDERS: ClientProvider[] = [
   {
     id: "cursor",
     name: "Cursor",
-    src: "/BRAND_ASSETS/clients/cursor.png",
+    src: mark("cursor"),
     href: "https://openrouter.ai/apps/url/https%3A%2F%2Fcursor.com%2F",
   },
   {
     id: "hermes",
     name: "Hermes",
-    src: "/BRAND_ASSETS/clients/hermes.png",
+    src: mark("hermes"),
     href: "https://openrouter.ai/apps/hermes-agent",
   },
   {
     id: "vs-code",
     name: "VS Code",
-    src: "/BRAND_ASSETS/clients/vs-code.png",
+    src: mark("vs-code"),
     href: "https://openrouter.ai/apps/url/https%3A%2F%2Fcode.visualstudio.com%2F",
   },
   {
     id: "freebuff",
     name: "FreeBuff",
-    src: "/BRAND_ASSETS/clients/freebuff.png",
+    src: mark("freebuff"),
     href: "https://openrouter.ai/apps/url/https%3A%2F%2Ffreebuff.com%2F",
   },
   {
     id: "open-webui",
     name: "Open WebUI",
-    src: "/BRAND_ASSETS/clients/open-webui.png",
+    src: mark("open-webui"),
     href: "https://openrouter.ai/apps/open-webui",
   },
   {
     id: "kilo-code",
     name: "Kilo Code",
-    src: "/BRAND_ASSETS/clients/kilo-code.png",
+    src: mark("kilo-code"),
     href: "https://openrouter.ai/apps/kilo-code",
   },
   {
     id: "codex",
     name: "Codex",
-    src: "/BRAND_ASSETS/clients/codex.png",
+    src: mark("codex"),
     href: "https://openrouter.ai/apps/codex",
   },
   // Added 2026-09-15 with the brand-raster refresh. The OpenRouter targets
@@ -76,7 +107,7 @@ export const CLIENT_PROVIDERS: ClientProvider[] = [
   {
     id: "cline",
     name: "Cline",
-    src: "/BRAND_ASSETS/clients/cline.png",
+    src: mark("cline"),
     href: "https://openrouter.ai/apps/cline",
   },
   {
@@ -84,7 +115,7 @@ export const CLIENT_PROVIDERS: ClientProvider[] = [
     // Label is "Claude Code", not "Claude" — the card must match the page it
     // opens, and the placeholder target is the `claude-code` app page.
     name: "Claude Code",
-    src: "/BRAND_ASSETS/clients/claude.png",
+    src: mark("claude"),
     href: "https://openrouter.ai/apps/claude-code",
   },
   // Added 2026-09-15 (user: *"lets add an image to this rotation… the name
@@ -97,7 +128,7 @@ export const CLIENT_PROVIDERS: ClientProvider[] = [
   {
     id: "openrouter",
     name: "Full List Here",
-    src: "/BRAND_ASSETS/clients/openrouter.png",
+    src: mark("openrouter"),
     href: "https://openrouter.ai/apps/#global-ranking",
   },
 ];
