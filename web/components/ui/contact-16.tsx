@@ -409,6 +409,27 @@ export function Contact16() {
             ))}
 
             <li className="flex items-center gap-2">
+              {/* **The balance spacer.** Below `xl` the column is centered, and
+                  the row is a flex pair — address + copy icon — so the *group*
+                  centers and the address itself lands exactly
+                  `(icon + gap) / 2` to the left of the axis: measured **165.5**
+                  against the page centre at **187.5** on a 375px viewport, i.e.
+                  the 22px the user saw ("the H and the I are not centered").
+                  This empty box is the icon's own size (`h-9 w-9`, the 36px
+                  face) and pre-pays the gap, so the address text itself sits on
+                  the axis while the icon still trails it.
+
+                  `gap-2` is already on the row, so the spacer's own gap plus
+                  its 36px equals the trailing `8 + 36` — the two sides balance
+                  and the text centers without any magic margin.
+
+                  **`xl:hidden`:** from `xl` up the rows are *left*-aligned
+                  (the column is `xl:items-start`, hanging off the form), so
+                  there is nothing to center and the address must keep sharing
+                  its left edge with `Instagram` / `X`. The spacer exists only
+                  for the centered stack. `aria-hidden` because it is a
+                  presentational box with no content. */}
+              <span aria-hidden className="h-9 w-9 shrink-0 xl:hidden" />
               {/* The address is the copy control. Its `aria-label` states the
                   action rather than repeating the address (the visible text is
                   already the address). */}
